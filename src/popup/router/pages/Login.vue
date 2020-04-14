@@ -7,8 +7,7 @@
 
 <script>
 import firebase from 'firebase/app'
-import 'firebase/firestore'
-import 'firebase/auth'
+import { firebaseApp, firebaseDb } from '../../../background';
 
 import Vue from 'vue'
 import Buefy from 'buefy'
@@ -21,14 +20,6 @@ import router from '../../router'
 import store from '../../../store'
 
 import { mapState } from 'vuex';
-
-// Initialize Firebase
-var config = {
-    apiKey: process.env.VUE_APP_APIKEY,
-    databaseURL: process.env.VUE_APP_DATABASEURL,
-    storageBucket: process.env.VUE_APP_STORAGEBUCKET,
-};
-firebase.initializeApp(config);
 
 export default {
     data: function() {
@@ -44,7 +35,7 @@ export default {
         initApp() {
             // Listen for auth state changes.
             // [START authstatelistener]
-            firebase.auth().onAuthStateChanged(function(user) {
+            firebaseApp.auth().onAuthStateChanged(function(user) {
                 console.log("firebase.auth go")
                 if (user) {
                     console.log("got a user")
@@ -75,7 +66,7 @@ export default {
                     // Authorize Firebase with the OAuth Access Token.
                     console.log("got an OAuth token. signing into Google with token.")
                     var credential = firebase.auth.GoogleAuthProvider.credential(null, token);
-                    firebase.auth().signInWithCredential(credential).catch(function(error) {
+                    firebaseApp.auth().signInWithCredential(credential).catch(function(error) {
                         // The OAuth token might have been invalidated. Lets' remove it from cache.
                         if (error.code === 'auth/invalid-credential') {
                             chrome.identity.removeCachedAuthToken({ token: token }, function() {
@@ -91,8 +82,8 @@ export default {
         startSignIn() {
             console.log("starting sign in...")
             document.getElementById('quickstart-button').disabled = true;
-            if (firebase.auth().currentUser) {
-                firebase.auth().signOut();
+            if (firebaseApp.auth().currentUser) {
+                firebaseApp.auth().signOut();
             } else {
                 this.startAuth(true);
             }

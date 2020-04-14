@@ -24,9 +24,9 @@
   "permissions": [
     "identity"
   ],
-  "content_security_policy": "script-src 'self' https://www.gstatic.com/ https://*.firebaseio.com https://www.googleapis.com https://apis.google.com; object-src 'self'",
+  "content_security_policy": "script-src 'self' https://www.gstatic.com/ https://*.firebaseio.com https://www.googleapis.com https://apis.google.com http://tutoa.co.nz http://fontawesome.com/; object-src 'self'",
   "oauth2": {
-    "client_id": "831532763147-cqkpgus0556atthr3i020s3gtc7kuim9.apps.googleusercontent.com",
+    "client_id": "831532763147-99or786g95luevq7nhm8i32a95oame36.apps.googleusercontent.com",
     "scopes": [
       "https://www.googleapis.com/auth/userinfo.email",
       "https://www.googleapis.com/auth/userinfo.profile"

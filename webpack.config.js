@@ -112,7 +112,7 @@ if (config.mode === 'development') {
         VUE_APP_APIKEY: '"AIzaSyAaN0ufMG7GsWnGJMKT644DuCTDjHralc4"',
         VUE_APP_DATABASEURL: '"https://tutoa-db.firebaseio.com"',
         VUE_APP_STORAGEBUCKET: '"tutoa-db.appspot.com"',
-        VUE_APP_CLIENTID: '"831532763147-cqkpgus0556atthr3i020s3gtc7kuim9.apps.googleusercontent.com"'
+        VUE_APP_PROJECTID: '"tutoa-db"',
       },
     }),
   ]);

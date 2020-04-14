@@ -11,15 +11,12 @@ import store from './store'
 var config = {
     apiKey: process.env.VUE_APP_APIKEY,
     databaseURL: process.env.VUE_APP_DATABASEURL,
-    storageBucket: process.env.VUE_APP_STORAGEBUCKET
+    storageBucket: process.env.VUE_APP_STORAGEBUCKET,
+    projectId: "tutoa-db",
 };
 
-if (!firebase.apps.length) {
-    firebase.initializeApp(config);
-}
-
-//   const db = firebase.firestore()
-//   const studentsDb = db.collection("students")
+export const firebaseApp = !firebase.apps.length ? firebase.initializeApp(config) : firebase.app();
+export const firebaseDb = firebase.firestore()
 
 /**
  * initApp handles setting up the Firebase context and registering

@@ -13,7 +13,7 @@ export default [
   {
     path: '/',
     beforeEnter: (to, from, next) => {
-      if (store.state.user) {
+      if (store.state.user.displayName !== null) {
         next('profile')
       } else {
         next('login')
