@@ -3,26 +3,27 @@ import Vue from 'vue'
 import Vuex from 'vuex'
 
 import * as getters from './getters'
-// import mutations from './mutations'
+import mutations from './mutations'
 // import * as actions from './actions'
 
-import { vuexfireMutations, firestoreAction  } from 'vuexfire'
-import { db } from '../config/firebase'
+import { firestoreAction  } from 'vuexfire'
+// import { db } from '../config/firebase'
 
 Vue.use(Vuex)
 
 export default new Vuex.Store({
   state: {
-    foo: 'World',
+    foo: 'Ian',
+    welcome: 'Kia ora, tena koe',
     students: [],
-    welcome: 'Kia ora, gidday'
+    user: null
   },
   getters,
-  mutations: vuexfireMutations,
-  actions: {
-    bindStudents: firestoreAction(({ bindFirestoreRef }) => {
-      // return the promise returned by `bindFirestoreRef`
-      return bindFirestoreRef('students', db.collection('students'))
-    }),
-  },
+  mutations,
+  // actions: {
+  //   bindStudents: firestoreAction(({ bindFirestoreRef }) => {
+  //     // return the promise returned by `bindFirestoreRef`
+  //     return bindFirestoreRef('students', db.collection('students'))
+  //   }),
+  // },
 })

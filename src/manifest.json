@@ -7,6 +7,7 @@
     "48": "icons/icon_48.png",
     "128": "icons/icon_128.png"
   },
+  "web_accessible_resources": ["images/*.png", "images/*.jpg", "images/*.JPG"],
   "browser_action": {
     "default_title": "tw-taupanga-chrome-extension-with-vue",
     "default_popup": "popup/popup.html"
@@ -19,5 +20,16 @@
   "options_ui": {
     "page": "options/options.html",
     "chrome_style": true
+  },
+  "permissions": [
+    "identity"
+  ],
+  "content_security_policy": "script-src 'self' https://www.gstatic.com/ https://*.firebaseio.com https://www.googleapis.com https://apis.google.com; object-src 'self'",
+  "oauth2": {
+    "client_id": "831532763147-cqkpgus0556atthr3i020s3gtc7kuim9.apps.googleusercontent.com",
+    "scopes": [
+      "https://www.googleapis.com/auth/userinfo.email",
+      "https://www.googleapis.com/auth/userinfo.profile"
+    ]
   }
 }

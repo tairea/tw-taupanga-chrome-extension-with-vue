@@ -104,6 +104,22 @@ if (config.mode === 'production') {
   ]);
 }
 
+if (config.mode === 'development') {
+  config.plugins = (config.plugins || []).concat([
+    new webpack.DefinePlugin({
+      'process.env': {
+        NODE_ENV: '"development"',
+        VUE_APP_APIKEY: '"AIzaSyAaN0ufMG7GsWnGJMKT644DuCTDjHralc4"',
+        VUE_APP_DATABASEURL: '"https://tutoa-db.firebaseio.com"',
+        VUE_APP_STORAGEBUCKET: '"tutoa-db.appspot.com"',
+        VUE_APP_CLIENTID: '"831532763147-cqkpgus0556atthr3i020s3gtc7kuim9.apps.googleusercontent.com"'
+      },
+    }),
+  ]);
+}
+
+
+
 if (process.env.HMR === 'true') {
   config.plugins = (config.plugins || []).concat([
     new ExtensionReloader({

@@ -19,11 +19,11 @@ export default {
         }
     },
     computed: mapState(['students', 'foo', 'welcome']),
-    methods: {
-        ...mapActions([
-            'bindStudents', // map `this.bindStudents()` to `this.$store.dispatch('increment')`
-        ]),
-    },
+    // methods: {
+    //     ...mapActions([
+    //         'bindStudents', // map `this.bindStudents()` to `this.$store.dispatch('increment')`
+    //     ]),
+    // },
     mounted() {
         this.$store.dispatch('bindStudents')
     }
