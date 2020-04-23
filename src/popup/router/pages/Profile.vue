@@ -2,39 +2,53 @@
     <div>
         <router-link to="logout">
             <div class="header">
-                <p class="is-size-7">Signed in as:<br />{{user.email}}</p>
-                <img :src="user.photoURL" class="profile-pic" />
+                <h1 id="name">{{student.given_name}}</h1>
+                <!-- <p class="is-size-7">Signed in as:<br />{{user.email}}</p> -->
+                <img v-if="profilePicUrl" :src="profilePicUrl" class="profile-pic" />
             </div>
         </router-link>
 
-        <hr />
+        <!-- <p>{{ nsn }}</p> -->
 
-        <!-- TODO: Get Tutoa Database data for signed in user. -->
-        <ul v-if="students.length > 0">
-            <li>got the following students...</li>
-            <li v-for="(student, index) in students" :key="index">{{ student.given_name }}</li>
-        </ul>
+        <Todos :todos="todos"/>
 
     </div>
 </template>
 
 <script>
-
     import router from '../../router'
     import store from '../../../store'
-
     import { mapState, mapActions } from 'vuex'
 
+    import Todos from "../../../components/Todos.vue";
+
     export default {
+        name: "Profile",
+        components: {
+            Todos
+        },
         computed: {
-            ...mapState(['user', 'students'])
+            ...mapState(['user', 'student', 'nsn', 'todos', 'profilePicUrl']),
         },
-        methods: {
+        watch: {
+            student: function (student) {
+                if (student.nsn) {
+                    // update nsn
+                    store.commit('storeNsn', student.nsn)
+                    // bind todos
+                    store.dispatch('bindTodos', student.nsn)
+                    // get profilePic
+                    store.dispatch('getProfilePic', student.given_name.toLowerCase())
+                }
+            }
         },
+        methods: {},
         mounted() {
-            this.$store.dispatch('bindStudents', this.user.email)
+            store.dispatch('bindStudent', this.user.email).then(() => {
+                store.commit('mapStudentData')
+            })
         }
-       
+
     }
 </script>
 
@@ -45,11 +59,18 @@
         display: flex;
         justify-content: space-around;
         align-items: center;
+        background: black;
+
+        #name {
+            color: white;
+            font-weight: 800;
+        }
 
         .profile-pic {
             width: 50px;
             height: 50px;
             border-radius: 50%;
+            background: white;
         }
     }
 </style>

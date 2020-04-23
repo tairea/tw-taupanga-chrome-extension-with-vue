@@ -1,6 +1,7 @@
 import firebase from 'firebase/app'
 import 'firebase/firestore'
 import 'firebase/auth'
+import 'firebase/storage'
 
 import router from './popup/router'
 
@@ -17,6 +18,7 @@ var config = {
 
 export const firebaseApp = !firebase.apps.length ? firebase.initializeApp(config) : firebase.app();
 export const firebaseDb = firebase.firestore()
+export const firebaseStorage = firebase.storage()
 
 /**
  * initApp handles setting up the Firebase context and registering
