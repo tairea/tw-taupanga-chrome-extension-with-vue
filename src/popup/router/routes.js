@@ -1,3 +1,5 @@
+/* === NOT IN USE, MOVED THIS CODE UP TO ROUTER/INDEX.JS
+
 import firebase from 'firebase/app'
 import 'firebase/firestore'
 import 'firebase/auth'
@@ -29,7 +31,6 @@ export default [
     beforeEnter: (to, from, next) => {
       if (store.state.user) {
         firebase.auth().signOut()
-        store.commit('USER_FALSE')
         next('login')
       } else {
         next('/')
@@ -43,3 +44,4 @@ export default [
   },
   { path: '*', component: FourOhFour }
 ]
+/*

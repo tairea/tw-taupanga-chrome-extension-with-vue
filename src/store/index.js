@@ -28,14 +28,8 @@ export default new Vuex.Store({
   },
   getters,
   mutations: {
-    UPDATE_USER (state, user) {
+    storeUser (state, user) {
       state.user = user
-    },
-    USER_TRUE (state) {
-      state.loggedIn = true
-    },
-    USER_FALSE (state) {
-      state.loggedIn = false
     },
     storeNsn (state, nsn) {
       console.log("update student nsn mutation triggered. nsn is = " + nsn)

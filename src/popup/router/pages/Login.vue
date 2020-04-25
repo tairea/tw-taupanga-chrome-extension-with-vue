@@ -36,22 +36,14 @@ export default {
             // Listen for auth state changes.
             // [START authstatelistener]
             firebaseApp.auth().onAuthStateChanged(function(user) {
-                console.log("firebase.auth go")
                 if (user) {
-                    console.log("got a user")
-                    // User is signed in.
-                    console.log("user is: " + user.displayName)
                     // save user to store
-                    store.commit('UPDATE_USER', user)
-                    // set gotUser in store to true
-                    store.commit('USER_TRUE')
-
-                    console.log('user saved in store is: ' + store.getters.user.displayName)
-                    // route to profile page
-                    router.push('profile')
-                } else {
-                    console.log("no user yet")
-                }
+                    store.commit('storeUser', user)
+                    // check user is in store
+                    console.log(store.getters.user.displayName + " signed in")
+                    // route to home aka profile page
+                    router.push('/')
+                } else { }
                 document.getElementById('quickstart-button').disabled = false;
             });
         },

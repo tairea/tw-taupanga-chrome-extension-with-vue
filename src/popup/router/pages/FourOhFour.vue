@@ -1,10 +1,11 @@
 <template>
-    <h1>
-        404 not found</h1>
+    <router-link to="logout">
+        <h1>404 not found</h1>
+    </router-link>
 </template>
 
 <script>
-export default {}
+    export default {}
 </script>
 
 <style lang="scss">
