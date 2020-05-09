@@ -20,14 +20,21 @@ export default new Vuex.Store({
       photoURL: null,
     },
     loggedIn: false,
+    studentOrStaff: 'student',
     students: [],
     student: {},
+    staffs: [],
+    staff: {},
     todos: [],
     nsn: '123',
     profilePicUrl: ''
   },
   getters,
   mutations: {
+    setAsStaff(state) {
+      console.log("set as staff")
+      state.studentOrStaff = 'staff'
+    },
     storeUser (state, user) {
       state.user = user
     },
@@ -43,12 +50,21 @@ export default new Vuex.Store({
       state.student = state.students[0]
       console.log(state.student)
     },
+    mapStaffData (state) {
+      console.log("mapping staff")
+      state.staff = state.staffs[0]
+      console.log(state.staff)
+    },
     ...vuexfireMutations,
   },
   actions: {
     bindStudent: firestoreAction(({ bindFirestoreRef}, userEmail) => {
       // return the promise returned by `bindFirestoreRef`
       return bindFirestoreRef('students', firebaseDb.collection('students').where("email", "array-contains", userEmail ))
+    }),
+    bindStaff: firestoreAction(({ bindFirestoreRef}, userEmail) => {
+      // return the promise returned by `bindFirestoreRef`
+      return bindFirestoreRef('staffs', firebaseDb.collection('staff').where("email", "==", userEmail ))
     }),
     bindTodos: firestoreAction(({ bindFirestoreRef}, number ) => {
       console.log("vuexfire bindTodos triggered. with = " + number)

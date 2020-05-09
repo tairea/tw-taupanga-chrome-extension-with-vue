@@ -15,7 +15,7 @@
                         <!-- Task Panel -->
                         <nav v-for="(task, index) in todo.todo" :key="index" class="panel">
                                 <p class="panel-heading">
-                                  Task {{index}}
+                                  Task {{index + 1}}
                                 </p>
                                 <!-- Tabs -->
                                 <!-- <p class="panel-tabs">

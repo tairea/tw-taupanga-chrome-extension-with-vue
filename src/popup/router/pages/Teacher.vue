@@ -1,16 +1,43 @@
 <template>
     <div>
         <router-link to="logout">
-            <!-- <div class="header">
-                <h1 id="name">{{student.given_name}}</h1>
+            <div class="header">
+                <h1 id="name">{{staff.given_name}}</h1>
                 <img v-if="profilePicUrl" :src="profilePicUrl" class="profile-pic" />
-            </div> -->
-            <h1>Teacher Account</h1>
+            </div>
         </router-link>
 
-        <!-- <p>{{ nsn }}</p> -->
+        <section>
+            <!-- CLASSES NAV -->
+            <b-tabs v-model="activeTab">
+                <template v-for="(classGroup, index) in staff.classes">
+                    <b-tab-item :key="index" :label="classGroup.year_name">
 
-        <Todos :todos="todos"/>
+                        <!-- MODULE COMPONENTS -->
+                        <transition name="dip" mode="out-in">
+                            <Module v-if="showModulesFlag" :modules="modules" @viewModule="viewModule($event)"
+                                @editModule="editModule($event)" />
+                        <!-- </transition> -->
+
+
+                        <!-- <transition name="backward" mode="out-in"> -->
+                            <ViewModule v-else="viewModuleFlag" :module="selectedModule" @back="showModules()" />
+                        </transition>
+
+                        <EditModule v-if="editModuleFlag" :module="selectedModule" @back="updateModule($event)" />
+
+                        <!-- TODO: <Milestone> -->
+
+                        <!-- TODO: Add Button router to <EditModule> -->
+                        <div class="addButton">
+                            <b-icon icon="plus" size="is-large" type="is-grey-light">
+                            </b-icon>
+                        </div>
+
+                    </b-tab-item>
+                </template>
+            </b-tabs>
+        </section>
 
     </div>
 </template>
@@ -18,34 +45,180 @@
 <script>
     import router from '../../router'
     import store from '../../../store'
-    import { mapState, mapActions } from 'vuex'
+    import {
+        mapState,
+        mapActions
+    } from 'vuex'
 
-    import Todos from "../../../components/Todos.vue";
+    import Module from "../../../components/Module.vue";
+    import ViewModule from "../../../components/ViewModule.vue";
+    import EditModule from "../../../components/EditModule.vue";
 
     export default {
         name: "Teacher",
         components: {
-            Todos
+            Module,
+            ViewModule,
+            EditModule,
         },
         computed: {
-            ...mapState(['user', 'student', 'nsn', 'todos', 'profilePicUrl']),
+            ...mapState(['user', 'staff', 'profilePicUrl']),
+        },
+        data() {
+            return {
+                activeTab: 0,
+                showModulesFlag: true,
+                viewModuleFlag: false,
+                editModuleFlag: false,
+                selectedModule: null,
+                selectedModuleId: null,
+                modules: [{
+                        id: 123,
+                        title: 'Website',
+                        subject: 'Innovation',
+                        milestones: [{
+                                milestoneName: 'milestone 1',
+                                milestoneInstructions: 'Please read this document',
+                                milestoneCompleted: false,
+                                milestoneSubmission: '',
+                                milestoneLinks: [{
+                                        linkName: 'Instructions doc',
+                                        linkUrl: 'http://tairea.io'
+                                    },
+                                    {
+                                        linkName: 'Link to video',
+                                        linkUrl: 'http://tairea.io'
+                                    },
+                                ]
+                            },
+                            {
+                                milestoneName: 'milestone 2',
+                                milestoneInstructions: 'Complete these activities',
+                                milestoneCompleted: false,
+                                milestoneSubmission: '',
+                                milestoneLinks: [{
+                                        linkName: 'Activities doc',
+                                        linkUrl: 'http://tairea.io'
+                                    },
+                                    {
+                                        linkName: 'Link to video',
+                                        linkUrl: 'http://tairea.io'
+                                    },
+                                ]
+                            },
+                            {
+                                milestoneName: 'milestone 3',
+                                milestoneInstructions: 'Please read this document',
+                                milestoneCompleted: false,
+                                milestoneSubmission: '',
+                                milestoneLinks: [{
+                                        linkName: 'Instructions doc',
+                                        linkUrl: 'http://tairea.io'
+                                    },
+                                    {
+                                        linkName: 'Link to video',
+                                        linkUrl: 'http://tairea.io'
+                                    },
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        id: 456,
+                        title: 'VR Project',
+                        subject: 'Innovation',
+                        milestones: [{
+                                milestoneName: 'milestone 1',
+                                milestoneInstructions: 'Please read this document',
+                                milestoneCompleted: false,
+                                milestoneSubmission: '',
+                                milestoneLinks: [{
+                                        linkName: 'Instructions doc',
+                                        linkUrl: 'http://tairea.io'
+                                    },
+                                    {
+                                        linkName: 'Link to video',
+                                        linkUrl: 'http://tairea.io'
+                                    },
+                                ]
+                            },
+                            {
+                                milestoneName: 'milestone 2',
+                                milestoneInstructions: 'Complete these activities',
+                                milestoneCompleted: false,
+                                milestoneSubmission: '',
+                                milestoneLinks: [{
+                                        linkName: 'Activities doc',
+                                        linkUrl: 'http://tairea.io'
+                                    },
+                                    {
+                                        linkName: 'Link to video',
+                                        linkUrl: 'http://tairea.io'
+                                    },
+                                ]
+                            },
+                            {
+                                milestoneName: 'milestone 3',
+                                milestoneInstructions: 'Please read this document',
+                                milestoneCompleted: false,
+                                milestoneSubmission: '',
+                                milestoneLinks: [{
+                                        linkName: 'Instructions doc',
+                                        linkUrl: 'http://tairea.io'
+                                    },
+                                    {
+                                        linkName: 'Link to video',
+                                        linkUrl: 'http://tairea.io'
+                                    },
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            }
         },
         watch: {
-            student: function (student) {
-                if (student.nsn) {
+            staff: function (staff) {
+                console.log("staff watcher triggered")
+                if (staff.email) {
                     // update nsn
-                    store.commit('storeNsn', student.nsn)
+                    // store.commit('storeNsn', student.nsn)
                     // bind todos
-                    store.dispatch('bindTodos', student.nsn)
+                    // store.dispatch('bindTodos', student.nsn)
                     // get profilePic
-                    store.dispatch('getProfilePic', student.given_name.toLowerCase())
+                    console.log("getting profile pic for ", staff.given_name.toLowerCase())
+                    store.dispatch('getProfilePic', staff.given_name.toLowerCase())
                 }
             }
         },
-        methods: {},
+        methods: {
+            showModules() {
+                this.viewModuleFlag = false;
+                this.editModuleFlag = false;
+                this.showModulesFlag = true;
+            },
+            viewModule(module) {
+                console.log("view module is: ", module)
+                this.showModulesFlag = false;
+                this.selectedModule = module
+                this.viewModuleFlag = true;
+            },
+            editModule(module) {
+                console.log("edit module is: ", module)
+                this.showModulesFlag = false;
+                this.selectedModule = module
+                this.editModuleFlag = true;
+            },
+            updateModule(moduleObj) {
+                //search database for modules that match moduleObj.id
+
+            }
+
+        },
         mounted() {
-            store.dispatch('bindStudent', this.user.email).then(() => {
-                store.commit('mapStudentData')
+            // TODO: bind only once at the beginning. not everytime mounted. (maybe local storage)
+            store.dispatch('bindStaff', this.user.email).then(() => {
+                store.commit('mapStaffData')
             })
         }
 
@@ -73,4 +246,71 @@
             background: white;
         }
     }
+
+    .addButton {
+        width: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin: 50px 0px;
+    }
+
+    /* Slide VUE animation */
+    .forward-enter,
+    .forward-leave-to {
+        opacity: 0;
+        transform: translateX(-50px);
+        /* position: relative; */
+    }
+
+    .forward-enter-to,
+    .forward-leave {
+        opacity: 1;
+        transform: translateX(0px);
+        /* position: absolute; */
+    }
+
+    .forward-enter-active,
+    .forward-leave-active {
+        transition: all 300ms ease-out;
+    }
+
+    .backward-enter,
+    .backward-leave-to {
+        opacity: 0;
+        transform: translateX(50px);
+        /* position: relative; */
+    }
+
+    .backward-enter-to,
+    .backward-leave {
+        opacity: 1;
+        transform: translateX(0px);
+        /* position: absolute; */
+    }
+
+    .backward-enter-active,
+    .backward-leave-active {
+        transition: all 300ms ease-out;
+    }
+
+    .dip-enter,
+    .dip-leave-to {
+        opacity: 0;
+        transform: translateY(25px);
+        /* position: relative; */
+    }
+
+    .dip-enter-to,
+    .dip-leave {
+        opacity: 1;
+        transform: translateY(0px);
+        /* position: absolute; */
+    }
+
+    .dip-enter-active,
+    .dip-leave-active {
+        transition: all 200ms ease-out;
+    }
+
 </style>

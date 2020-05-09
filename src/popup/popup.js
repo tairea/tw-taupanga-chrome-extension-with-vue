@@ -6,6 +6,10 @@ import router from './router'
 import Buefy from 'buefy'
 import 'buefy/dist/buefy.css'
 
+Vue.use(Buefy, {
+  defaultIconPack: 'fas'
+});
+
 /* eslint-disable no-new */
 new Vue({
   el: '#app',

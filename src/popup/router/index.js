@@ -16,25 +16,13 @@ const router = new VueRouter({
   base: '/popup/popup.html',
   mode: 'history',
   routes: [
-    {
-      path: '/',
-      name: 'profile',
-      component: Profile,
-      meta: {
-        requiresAuth: true
-      }
+    { path: '/', name: 'profile', component: Profile,
+      meta: { requiresAuth: true }
     },
-    {
-      path: '/login',
-      name: 'login',
-      component: Login,
-      meta: {
-        requiresGuest: true
-      }
+    { path: '/login', name: 'login', component: Login,
+      meta: { requiresGuest: true }
     },
-    {
-      path: '/logout',
-      name: 'logout',
+    { path: '/logout', name: 'logout',
       beforeEnter: async (to, from, next) => {
             if (store.state.user) {
               console.log("logging " + store.state.user.displayName + " out")
@@ -45,10 +33,7 @@ const router = new VueRouter({
             }
           }
     },
-    {
-      path: '/teacher',
-      name: 'teacher',
-      component: Teacher,
+    { path: '/teacher', name: 'teacher', component: Teacher,
       meta: { requiresAuth: true }
     },
     { path: '*', component: FourOhFour }
@@ -90,6 +75,7 @@ router.beforeEach((to, from, next) => {
       console.log("checking if " + user.displayName + " is a teacher")
       if (to.path === '/' && teacherEmails.some((x) => x === user.email)) {
         console.log(user.displayName + " is a teacher")
+        store.commit('setAsStaff')
         // Go to teacher
         console.log("taking " + user.displayName + " to teacher page")
         next({
