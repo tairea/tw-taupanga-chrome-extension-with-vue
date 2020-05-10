@@ -47,14 +47,12 @@
       }
     },
     mounted() {
-      console.log("modules", this.modules)
     },
     computed: {
 
     },
     methods: {
       percentComplete() {
-        console.log("loading percentage")
         return 75
       }
     }

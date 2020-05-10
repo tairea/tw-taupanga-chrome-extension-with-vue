@@ -15,21 +15,27 @@
 
                         <!-- MODULE COMPONENTS -->
                         <transition name="dip" mode="out-in">
+
                             <Module v-if="showModulesFlag" :modules="modules" @viewModule="viewModule($event)"
                                 @editModule="editModule($event)" />
                         <!-- </transition> -->
 
-
                         <!-- <transition name="backward" mode="out-in"> -->
-                            <ViewModule v-else="viewModuleFlag" :module="selectedModule" @back="showModules()" />
+                            <ViewModule v-else-if="viewModuleFlag" :module="selectedModule" @back="showModules()" />
+
+                            
+                            <AddModule v-else-if="addModuleFlag" @close="showModules()" @save="updateModule($event)" />
                         </transition>
 
-                        <EditModule v-if="editModuleFlag" :module="selectedModule" @back="updateModule($event)" />
 
                         <!-- TODO: <Milestone> -->
 
-                        <!-- TODO: Add Button router to <EditModule> -->
-                        <div class="addButton">
+                        <!-- Add Button -->
+                        <div v-if="addModuleButton" class="addButton" @click="addModule()">
+                            <b-icon icon="plus" size="is-large" type="is-grey-light">
+                            </b-icon>
+                        </div>
+                        <div v-else-if="addMilestoneButton" class="addButton" @click="addMilestone()">
                             <b-icon icon="plus" size="is-large" type="is-grey-light">
                             </b-icon>
                         </div>
@@ -52,14 +58,14 @@
 
     import Module from "../../../components/Module.vue";
     import ViewModule from "../../../components/ViewModule.vue";
-    import EditModule from "../../../components/EditModule.vue";
+    import AddModule from "../../../components/AddModule.vue";
 
     export default {
         name: "Teacher",
         components: {
             Module,
             ViewModule,
-            EditModule,
+            AddModule,
         },
         computed: {
             ...mapState(['user', 'staff', 'profilePicUrl']),
@@ -69,9 +75,11 @@
                 activeTab: 0,
                 showModulesFlag: true,
                 viewModuleFlag: false,
-                editModuleFlag: false,
+                addModuleFlag: false,
                 selectedModule: null,
                 selectedModuleId: null,
+                addModuleButton: true,
+                addMilestoneButton: false,
                 modules: [{
                         id: 123,
                         title: 'Website',
@@ -194,25 +202,30 @@
         methods: {
             showModules() {
                 this.viewModuleFlag = false;
-                this.editModuleFlag = false;
+                this.addModuleFlag = false;
+                this.addMilestoneButton = false;
                 this.showModulesFlag = true;
+                this.addModuleButton = true;
             },
             viewModule(module) {
                 console.log("view module is: ", module)
                 this.showModulesFlag = false;
                 this.selectedModule = module
+                this.addModuleButton = false
                 this.viewModuleFlag = true;
+                this.addMilestoneButton = true
             },
-            editModule(module) {
-                console.log("edit module is: ", module)
+            addModule() {
                 this.showModulesFlag = false;
-                this.selectedModule = module
-                this.editModuleFlag = true;
+                this.viewModuleFlag = false;
+                this.addModuleButton = false;
+                this.addMilestoneButton = false;
+                this.addModuleFlag = true;
             },
             updateModule(moduleObj) {
                 //search database for modules that match moduleObj.id
 
-            }
+            },
 
         },
         mounted() {
@@ -253,6 +266,7 @@
         justify-content: center;
         align-items: center;
         margin: 50px 0px;
+        cursor: pointer;
     }
 
     /* Slide VUE animation */

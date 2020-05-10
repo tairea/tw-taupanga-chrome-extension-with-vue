@@ -44,7 +44,6 @@
         </p>
       </footer>
     </div>
-
   </div>
 </template>
 
@@ -61,14 +60,12 @@
       }
     },
     mounted() {
-      console.log("viewing this module: ", this.module)
     },
     computed: {
 
     },
     methods: {
       percentComplete() {
-        console.log("loading percentage")
         return 75
       }
     }
