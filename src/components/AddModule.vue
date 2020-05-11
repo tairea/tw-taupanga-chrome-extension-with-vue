@@ -5,25 +5,35 @@
         <div class="flex">
           <div class="module-title-col">
             <b-field label="Module Name">
-              <b-input value="Enter a name"></b-input>
+              <b-input v-model="moduleName" placeholder="Name Module" icon="book"></b-input>
             </b-field>
             <b-field label="Due Date">
-              <b-datepicker placeholder="Click to select..." icon="calendar-alt" trap-focus>
+              <b-datepicker v-model="moduleDate" placeholder="Set due date" icon="calendar-alt" trap-focus>
               </b-datepicker>
             </b-field>
           </div>
           <div class="new-module-pic-col">
-            <b-icon class="new-module-pic" icon="camera"></b-icon>
+            <!-- <vue-circle :progress="circleProgress" :size="70" :reverse="false" :fill="fill"
+              empty-fill="rgba(0, 0, 0, .1)" :animation-start-value="0.0" :start-angle="0" insert-mode="append"
+              :thickness="5" :show-percent="false"> -->
+              <b-field class="file">
+                <b-upload v-model="file" @input="uploadModuleImg()">
+                  <img ref="modulePicEl" v-if="modulePic" :src="modulePic" alt="" class="new-module-pic">
+                  <b-icon v-else class="new-module-pic" icon="camera"></b-icon>
+                </b-upload>
+              </b-field>
+            <!-- </vue-circle> -->
           </div>
         </div>
-
+        <progress ref="moduleProgressEl" value="0" max="100" id="uploader" class="is-circle">0%</progress>
       </div>
+
     </div>
     <div class="flex" style="justify-content: center; align-items: center; margin-top: 10px; margin-bottom: 50px;">
       <b-button type="is-dark" size="is-medium" outlined @click="$emit('close')" class="button-margin-10">
         Cancel
       </b-button>
-      <b-button type="is-info" size="is-medium" outlined @click="$emit('saveModule', getNewModuleDetails)">
+      <b-button type="is-info" size="is-medium" outlined @click="emitNewModuleDetails()">
         Save New Module
       </b-button>
     </div>
@@ -31,27 +41,64 @@
 </template>
 
 <script>
+  import VueCircle from 'vue2-circle-progress/src/index.vue'
+  import store from '../store'
+  import {
+    mapState,
+    mapActions
+  } from 'vuex'
+
   export default {
-    name: "Module",
+    name: "AddModule",
     props: ['modules'],
     components: {
-
+      VueCircle
     },
     data() {
       return {
-
+        file: null,
+        moduleName: null,
+        moduleDate: null,
+        modulePic: null,
+        circleProgress: 0,
+        fill: {
+          gradient: ["red", "green", "blue"]
+        },
       }
     },
     mounted() {
-      console.log("modules", this.modules)
-    },
-    computed: {
 
     },
+    watch: {
+      modulePicUrl: function (url) {
+        if (url) {
+          this.modulePic = url
+        }
+      },
+      modulePicProgress: function (progress) {
+        console.log("upload progress: ", progress)
+        this.$refs.moduleProgressEl.value = progress
+      }
+    },
+    computed: {
+      ...mapState(['modulePicUrl', 'modulePicProgress']),
+    },
     methods: {
+      ...mapActions(['saveModulePic']),
       percentComplete() {
         console.log("loading percentage")
         return 75
+      },
+      uploadModuleImg() {
+        this.saveModulePic(this.file)
+      },
+      emitNewModuleDetails() {
+        const moduleObj = {
+          moduleName: this.moduleName,
+          moduleDate: this.moduleDate,
+          modulePic: this.modulePic
+        }
+        this.$emit('saveModule', moduleObj)
       }
     }
   }
@@ -71,21 +118,16 @@
     display: flex;
     justify-content: flex-end;
     align-items: flex-start;
-    
-  }
-  
-  .new-module-pic {
-    border-radius: 50%;
-    border: solid 1px rgba(0,0,0,0.3);
-    width: 60px;
-    height: 60px;
+
   }
 
-  .module-pic {
+  .new-module-pic {
+    border-radius: 50%;
+    border: solid 1px rgba(0, 0, 0, 0.3);
     width: 60px;
     height: 60px;
-    border-radius: 50%;
-    background: white;
+    cursor: pointer;
+    object-fit: cover;
   }
 
   .button-margin-10 {

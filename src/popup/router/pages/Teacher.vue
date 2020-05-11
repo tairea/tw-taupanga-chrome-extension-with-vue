@@ -16,7 +16,7 @@
                         <!-- MODULE COMPONENTS -->
                         <transition name="dip" mode="out-in">
 
-                            <Module v-if="showModulesFlag" :modules="modules" @viewModule="viewModule($event)"
+                            <Module v-if="showModulesFlag" :modules="`${classGroup.className}+'_'+${classGroup.yearName}`" @viewModule="viewModule($event)"
                                 @editModule="editModule($event)" />
                         <!-- </transition> -->
 
@@ -24,7 +24,7 @@
                             <ViewModule v-else-if="viewModuleFlag" :module="selectedModule" @back="showModules()" />
 
                             
-                            <AddModule v-else-if="addModuleFlag" @close="showModules()" @save="updateModule($event)" />
+                            <AddModule v-else-if="addModuleFlag" @close="showModules()" @saveModule="saveModule($event,classGroup.year_name,classGroup.class_name)" />
                         </transition>
 
 
@@ -200,6 +200,7 @@
             }
         },
         methods: {
+            ...mapActions(['saveModuletoFirestore']),
             showModules() {
                 this.viewModuleFlag = false;
                 this.addModuleFlag = false;
@@ -222,8 +223,12 @@
                 this.addMilestoneButton = false;
                 this.addModuleFlag = true;
             },
-            updateModule(moduleObj) {
-                //search database for modules that match moduleObj.id
+            saveModule(moduleObj,year_name,class_name) {
+                this.showModules()
+                moduleObj.className = class_name
+                moduleObj.yearName = year_name
+                moduleObj.teacher = this.staff.family_name
+                this.saveModuletoFirestore(moduleObj)
 
             },
 

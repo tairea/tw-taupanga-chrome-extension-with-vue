@@ -35,6 +35,9 @@
 </template>
 
 <script>
+  import store from '../../../store'
+  import { mapState, mapActions } from 'vuex'
+
   export default {
     name: "Module",
     props: ['modules'],
@@ -46,12 +49,12 @@
 
       }
     },
-    mounted() {
-    },
+    mounted() {},
     computed: {
-
+      ...mapState(['user', 'staff', 'profilePicUrl']),
     },
     methods: {
+      ...mapActions(['saveModuletoFirestore']),
       percentComplete() {
         return 75
       }
@@ -78,8 +81,8 @@
 
 
   .module-pic {
-    width: 60px;
-    height: 60px;
+    width: 70px;
+    height: 70px;
     border-radius: 50%;
     background: white;
   }
