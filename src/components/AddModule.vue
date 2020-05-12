@@ -63,10 +63,6 @@
         moduleName: null,
         moduleDate: null,
         modulePic: null,
-        circleProgress: 0,
-        fill: {
-          gradient: ["red", "green", "blue"]
-        },
       }
     },
     mounted() {

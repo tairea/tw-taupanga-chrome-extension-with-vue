@@ -14,7 +14,7 @@
             {{ module.moduleMilestones.length }} Milestones
           </p>
 
-          <b-button type="is-primary" size="is-small" outlined @click="$emit('viewModule', module)">
+          <b-button type="is-primary" size="is-small" outlined @click="$emit('viewMilestones', module)">
             View Milestones
           </b-button>
         </div>
@@ -26,14 +26,16 @@
       </div>
 
       <footer class="card-footer">
-        <p class="card-footer-item has-text-grey-light">
-          Due in <span class="has-text-success has-text-weight-bold" style="padding: 0 10px;"> {{calculateDays(module.moduleDate)}}
-          </span> Days
-        </p>
-        <p class="card-footer-item has-text-grey-light">
-          Class is <span class="has-text-success has-text-weight-bold" style="padding: 0 10px;"> {{percentComplete()}}%
-          </span> Completed
-        </p>
+        <div class="card-footer-item" style="display: flex; flex-direction: column;">
+          <p class=" has-text-grey-light is-size-7">Due in</p>
+          <p class="has-text-success has-text-weight-bold is-size-6" style="padding: 0 10px;"> {{calculateDays(module.moduleDate)}} </p>
+          <p class=" has-text-grey-light is-size-7">Days</p>
+        </div>
+        <div class="card-footer-item" style="display: flex; flex-direction: column;">
+          <p class=" has-text-grey-light is-size-7">Class is</p>
+          <p class="has-text-success has-text-weight-bold is-size-6" style="padding: 0 10px;"> {{percentComplete()}}% </p>
+          <p class=" has-text-grey-light is-size-7">Complete</p>
+        </div>
       </footer>
     </div>
   </div>

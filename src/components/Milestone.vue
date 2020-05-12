@@ -1,27 +1,6 @@
 <template>
-  <div>
-    <!-- MODULE BANNER -->
-    <div class="module-banner has-background-info">
-      <div class="module-back-button" @click="$emit('back')">
-        <b-icon icon="chevron-left"></b-icon>
-      </div>
-
-      <div class="module-title-col">
-        <p class="is-size-6 has-text-weight-semibold">
-          {{ module.title }}
-        </p>
-        <p class="subtitle is-size-6 has-text-white">
-          {{ module.milestones.length }} Milestones
-        </p>
-      </div>
-
-      <div class="module-pic-col">
-        <img src="https://picsum.photos/100/100" class="module-pic">
-      </div>
-    </div>
-
     <!-- MILESTONES -->
-    <div v-for="(milestone, index) in module.milestones" :key="index" class="card" style="margin: 20px;">
+    <div v-for="(milestone, index) in module.moduleMilestones" :key="index" class="card" style="margin: 20px;">
       <div class="card-content">
         <div class="flex">
           <div class="milestone-number">
@@ -44,12 +23,30 @@
         </p>
       </footer>
     </div>
-  </div>
 </template>
+
+<!-- 
+  milestoneName
+  milestoneInstructions
+  milestoneLinks [
+    {
+      name: String,
+      link: URL
+    }
+  ]
+  
+  milestoneHasActivityAndSubmission: Bool
+
+  milestoneActivityInstructions: 
+  milestoneActivitySubmission: Boolean
+  milestoneIsSubmitted: Boolean
+
+
+ -->
 
 <script>
   export default {
-    name: "Module",
+    name: "Milestones",
     props: ['module'],
     components: {
 
@@ -84,14 +81,6 @@
     display: flex;
   }
 
-  .module-banner {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    color: white;
-    padding: 10px;
-  }
-
   .milestone-number {
     width: 40px;
     height: 40px;
@@ -106,28 +95,4 @@
     padding-left: 24px;
   }
 
-  .title {
-    margin: 0px;
-  }
-
-  .module-back-button {
-    width: 10%;
-    cursor: pointer;
-  }
-
-  .module-title-col {
-    width: 90%;
-  }
-
-  .module-pic-col {
-    position: absolute;
-    right: 0;
-  }
-
-  .module-pic {
-    width: 50px;
-    height: 50px;
-    border-radius: 50%;
-    background: white;
-  }
 </style>

@@ -16,16 +16,13 @@
                         <!-- MODULE COMPONENTS -->
                         <transition name="dip" mode="out-in">
 
-                            <Module v-if="showModulesFlag" :modules="getModulesForThisClass(classGroup.year_name)" @viewModule="viewModule($event)"
-                                @editModule="editModule($event)" />
-                        <!-- </transition> -->
-
-                        <!-- <transition name="backward" mode="out-in"> -->
-                            <ViewModule v-else-if="viewModuleFlag" :module="selectedModule" @back="showModules()" />
-
-                            <EditModule v-else-if="editModuleFlag" :module="selectedModule" :className="classGroup.class_name" :yearName="classGroup.year_name" @close="showModules()" @saveModule="saveModule($event,classGroup.year_name,classGroup.class_name)" />
-                            
+                            <Module v-if="showModulesFlag" :modules="getModulesForThisClass(classGroup.year_name)" @viewMilestones="viewMilestones($event)" @editModule="editModule($event)" />
                             <AddModule v-else-if="addModuleFlag" :className="classGroup.class_name" :yearName="classGroup.year_name" @close="showModules()" @saveModule="saveModule($event,classGroup.year_name,classGroup.class_name)" />
+                            <EditModule v-else-if="editModuleFlag" :module="selectedModule" :className="classGroup.class_name" :yearName="classGroup.year_name" @close="showModules()" @saveModule="saveModule($event,classGroup.year_name,classGroup.class_name)" />
+                        
+                            <ViewMilestones v-else-if="viewMilestonesFlag" :module="selectedModule" @addMilestone="addMilestone($event)" @back="showModules()" />
+                            <AddMilestone v-else-if="addMilestoneFlag" :module="selectedModule" @back="showModules()" @saveMilestone="saveMilestone($event,classGroup.year_name,classGroup.class_name)" />
+                            
                         </transition>
 
 
@@ -33,12 +30,7 @@
 
                         <!-- Add Button -->
                         <div v-if="addModuleButton" class="addButton" @click="addModule()">
-                            <b-icon icon="plus" size="is-large" type="is-grey-light">
-                            </b-icon>
-                        </div>
-
-                        <div v-else-if="addMilestoneButton" class="addButton" @click="addMilestone()">
-                            <b-icon icon="plus" size="is-large" type="is-grey-light">
+                            <b-icon icon="plus" size="is-large">
                             </b-icon>
                         </div>
 
@@ -59,39 +51,42 @@
     } from 'vuex'
 
     import Module from "../../../components/Module.vue";
-    import ViewModule from "../../../components/ViewModule.vue";
     import AddModule from "../../../components/AddModule.vue";
     import EditModule from "../../../components/EditModule.vue";
+    
+    import ViewMilestones from "../../../components/ViewMilestones.vue";
+    import AddMilestone from "../../../components/AddMilestone.vue";
+
 
     export default {
         name: "Teacher",
         components: {
             Module,
-            ViewModule,
             AddModule,
             EditModule,
+            ViewMilestones,
+            AddMilestone
         },
         data() {
             return {
                 activeTab: 0,
+                // flags to show/hide views
                 showModulesFlag: true,
-                viewModuleFlag: false,
+                // viewModuleFlag: false,
                 addModuleFlag: false,
                 editModuleFlag: false,
-                selectedModule: null,
+                viewMilestonesFlag: false,
+                addMilestoneFlag: false,
+
                 addModuleButton: true,
-                addMilestoneButton: false,
+
+                selectedModule: null,
             }
         },
         watch: {
             staff: function (staff) {
                 console.log("staff watcher triggered")
                 if (staff.email) {
-                    // update nsn
-                    // store.commit('storeNsn', student.nsn)
-                    // bind todos
-                    // store.dispatch('bindTodos', student.nsn)
-                    // get profilePic
                     console.log("getting profile pic for ", staff.given_name.toLowerCase())
                     store.dispatch('getProfilePic', staff.given_name.toLowerCase())
                 }
@@ -102,46 +97,59 @@
         },
         methods: {
             ...mapActions(['saveModuletoFirestore']),
+            hideAllViewsAndButtons() {
+                this.showModulesFlag = false
+                // this.viewModuleFlag = false
+                this.addModuleFlag = false
+                this.editModuleFlag = false
+                this.viewMilestonesFlag = false
+                // this.addMilestoneFlag = false
+                // this.addModuleButton = false
+            },
             showModules() {
-                this.viewModuleFlag = false;
-                this.addModuleFlag = false;
-                this.addMilestoneButton = false;
+                this.hideAllViewsAndButtons()
                 this.showModulesFlag = true;
                 this.addModuleButton = true;
             },
-            viewModule(module) {
-                console.log("view module is: ", module)
-                this.showModulesFlag = false;
-                this.selectedModule = module
-                this.addModuleButton = false
-                this.viewModuleFlag = true;
-                this.addMilestoneButton = true
-            },
+            // viewModule(module) {
+            //     console.log("view module is: ", module)
+            //     this.hideAllViewsAndButtons()
+            //     // set selected module
+            //     this.selectedModule = module
+            //     // show view and matching button
+            //     this.viewModuleFlag = true;
+            //     this.addMilestoneButton = true
+            // },
             addModule() {
-                // hide other views
-                this.showModulesFlag = false;
-                this.viewModuleFlag = false;
-                this.editModuleFlag = false;
-                // hide buttons
-                this.addModuleButton = false;
-                this.addMilestoneButton = false;
+                this.hideAllViewsAndButtons()
                 // show view
                 this.addModuleFlag = true;
+                this.addModuleButton = false;
             },
             editModule(module) {
-                console.log("from emit: ", module)
-                // hide other views
-                this.showModulesFlag = false;
-                this.viewModuleFlag = false;
-                this.addModuleFlag = false;
-                // hide buttons
-                this.addModuleButton = false;
-                this.addMilestoneButton = false;
+                this.hideAllViewsAndButtons()
                 // set seleted module
                 this.selectedModule = module;
                 // show view
                 this.editModuleFlag = true;
+                this.addModuleButton = false;
             },
+            viewMilestones(module) {
+                this.hideAllViewsAndButtons()
+                // set seleted module
+                this.selectedModule = module;
+                // show view
+                this.viewMilestonesFlag = true;
+                this.addModuleButton = false;
+            },
+            addMilestone(module) {
+                this.hideAllViewsAndButtons()
+                // set seleted module
+                this.selectedModule = module;
+                this.addMilestoneFlag = true;
+                this.addModuleButton = false;
+            },
+
             saveModule(moduleObj,year_name,class_name) {
                 this.showModules()
                 moduleObj.className = class_name
@@ -150,12 +158,22 @@
                 moduleObj.moduleMilestones = []
                 this.saveModuletoFirestore(moduleObj)
             },
+           
             getModulesForThisClass(year_name)  {
                 var result = this.modules.filter(obj => {
                     return obj.yearName === year_name
                 })
                 return result
-            }
+            },
+            saveMilestone(milestoneObj,year_name,class_name) {
+                // TODO: need module details to save milestone to right place
+                // this.showModules()
+                // milestoneObj.className = class_name
+                // milestoneObj.yearName = year_name
+                // milestoneObj.teacher = this.staff.family_name
+                // milestoneObj.moduleMilestones = []
+                // this.saveMilestonetoFirestore(moduleObj)
+            },
 
         },
         mounted() {
@@ -205,6 +223,7 @@
         align-items: center;
         margin: 50px 0px;
         cursor: pointer;
+        color: rgba(0,0,0,0.3);
     }
 
     /* Slide VUE animation */

@@ -62,14 +62,10 @@
         moduleName: this.module.moduleName,
         moduleDate: this.calcDate(),
         modulePic: this.module.modulePic,
-        circleProgress: 0,
-        fill: {
-          gradient: ["red", "green", "blue"]
-        },
       }
     },
     mounted() {
-      console.log("from within module EDIT: ", this.module)
+      
     },
     watch: {
       modulePicUrl: function (url) {
