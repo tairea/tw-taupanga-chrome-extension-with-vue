@@ -16,7 +16,7 @@
                         <!-- MODULE COMPONENTS -->
                         <transition name="dip" mode="out-in">
 
-                            <Module v-if="showModulesFlag" :modules="`${classGroup.className}+'_'+${classGroup.yearName}`" @viewModule="viewModule($event)"
+                            <Module v-if="showModulesFlag" :modules="getModulesForThisClass(classGroup.year_name)" @viewModule="viewModule($event)"
                                 @editModule="editModule($event)" />
                         <!-- </transition> -->
 
@@ -67,9 +67,6 @@
             ViewModule,
             AddModule,
         },
-        computed: {
-            ...mapState(['user', 'staff', 'profilePicUrl']),
-        },
         data() {
             return {
                 activeTab: 0,
@@ -80,109 +77,109 @@
                 selectedModuleId: null,
                 addModuleButton: true,
                 addMilestoneButton: false,
-                modules: [{
-                        id: 123,
-                        title: 'Website',
-                        subject: 'Innovation',
-                        milestones: [{
-                                milestoneName: 'milestone 1',
-                                milestoneInstructions: 'Please read this document',
-                                milestoneCompleted: false,
-                                milestoneSubmission: '',
-                                milestoneLinks: [{
-                                        linkName: 'Instructions doc',
-                                        linkUrl: 'http://tairea.io'
-                                    },
-                                    {
-                                        linkName: 'Link to video',
-                                        linkUrl: 'http://tairea.io'
-                                    },
-                                ]
-                            },
-                            {
-                                milestoneName: 'milestone 2',
-                                milestoneInstructions: 'Complete these activities',
-                                milestoneCompleted: false,
-                                milestoneSubmission: '',
-                                milestoneLinks: [{
-                                        linkName: 'Activities doc',
-                                        linkUrl: 'http://tairea.io'
-                                    },
-                                    {
-                                        linkName: 'Link to video',
-                                        linkUrl: 'http://tairea.io'
-                                    },
-                                ]
-                            },
-                            {
-                                milestoneName: 'milestone 3',
-                                milestoneInstructions: 'Please read this document',
-                                milestoneCompleted: false,
-                                milestoneSubmission: '',
-                                milestoneLinks: [{
-                                        linkName: 'Instructions doc',
-                                        linkUrl: 'http://tairea.io'
-                                    },
-                                    {
-                                        linkName: 'Link to video',
-                                        linkUrl: 'http://tairea.io'
-                                    },
-                                ]
-                            }
-                        ]
-                    },
-                    {
-                        id: 456,
-                        title: 'VR Project',
-                        subject: 'Innovation',
-                        milestones: [{
-                                milestoneName: 'milestone 1',
-                                milestoneInstructions: 'Please read this document',
-                                milestoneCompleted: false,
-                                milestoneSubmission: '',
-                                milestoneLinks: [{
-                                        linkName: 'Instructions doc',
-                                        linkUrl: 'http://tairea.io'
-                                    },
-                                    {
-                                        linkName: 'Link to video',
-                                        linkUrl: 'http://tairea.io'
-                                    },
-                                ]
-                            },
-                            {
-                                milestoneName: 'milestone 2',
-                                milestoneInstructions: 'Complete these activities',
-                                milestoneCompleted: false,
-                                milestoneSubmission: '',
-                                milestoneLinks: [{
-                                        linkName: 'Activities doc',
-                                        linkUrl: 'http://tairea.io'
-                                    },
-                                    {
-                                        linkName: 'Link to video',
-                                        linkUrl: 'http://tairea.io'
-                                    },
-                                ]
-                            },
-                            {
-                                milestoneName: 'milestone 3',
-                                milestoneInstructions: 'Please read this document',
-                                milestoneCompleted: false,
-                                milestoneSubmission: '',
-                                milestoneLinks: [{
-                                        linkName: 'Instructions doc',
-                                        linkUrl: 'http://tairea.io'
-                                    },
-                                    {
-                                        linkName: 'Link to video',
-                                        linkUrl: 'http://tairea.io'
-                                    },
-                                ]
-                            }
-                        ]
-                    }
-                ]
+            //     modules: [{
+            //             id: 123,
+            //             title: 'Website',
+            //             subject: 'Innovation',
+            //             milestones: [{
+            //                     milestoneName: 'milestone 1',
+            //                     milestoneInstructions: 'Please read this document',
+            //                     milestoneCompleted: false,
+            //                     milestoneSubmission: '',
+            //                     milestoneLinks: [{
+            //                             linkName: 'Instructions doc',
+            //                             linkUrl: 'http://tairea.io'
+            //                         },
+            //                         {
+            //                             linkName: 'Link to video',
+            //                             linkUrl: 'http://tairea.io'
+            //                         },
+            //                     ]
+            //                 },
+            //                 {
+            //                     milestoneName: 'milestone 2',
+            //                     milestoneInstructions: 'Complete these activities',
+            //                     milestoneCompleted: false,
+            //                     milestoneSubmission: '',
+            //                     milestoneLinks: [{
+            //                             linkName: 'Activities doc',
+            //                             linkUrl: 'http://tairea.io'
+            //                         },
+            //                         {
+            //                             linkName: 'Link to video',
+            //                             linkUrl: 'http://tairea.io'
+            //                         },
+            //                     ]
+            //                 },
+            //                 {
+            //                     milestoneName: 'milestone 3',
+            //                     milestoneInstructions: 'Please read this document',
+            //                     milestoneCompleted: false,
+            //                     milestoneSubmission: '',
+            //                     milestoneLinks: [{
+            //                             linkName: 'Instructions doc',
+            //                             linkUrl: 'http://tairea.io'
+            //                         },
+            //                         {
+            //                             linkName: 'Link to video',
+            //                             linkUrl: 'http://tairea.io'
+            //                         },
+            //                     ]
+            //                 }
+            //             ]
+            //         },
+            //         {
+            //             id: 456,
+            //             title: 'VR Project',
+            //             subject: 'Innovation',
+            //             milestones: [{
+            //                     milestoneName: 'milestone 1',
+            //                     milestoneInstructions: 'Please read this document',
+            //                     milestoneCompleted: false,
+            //                     milestoneSubmission: '',
+            //                     milestoneLinks: [{
+            //                             linkName: 'Instructions doc',
+            //                             linkUrl: 'http://tairea.io'
+            //                         },
+            //                         {
+            //                             linkName: 'Link to video',
+            //                             linkUrl: 'http://tairea.io'
+            //                         },
+            //                     ]
+            //                 },
+            //                 {
+            //                     milestoneName: 'milestone 2',
+            //                     milestoneInstructions: 'Complete these activities',
+            //                     milestoneCompleted: false,
+            //                     milestoneSubmission: '',
+            //                     milestoneLinks: [{
+            //                             linkName: 'Activities doc',
+            //                             linkUrl: 'http://tairea.io'
+            //                         },
+            //                         {
+            //                             linkName: 'Link to video',
+            //                             linkUrl: 'http://tairea.io'
+            //                         },
+            //                     ]
+            //                 },
+            //                 {
+            //                     milestoneName: 'milestone 3',
+            //                     milestoneInstructions: 'Please read this document',
+            //                     milestoneCompleted: false,
+            //                     milestoneSubmission: '',
+            //                     milestoneLinks: [{
+            //                             linkName: 'Instructions doc',
+            //                             linkUrl: 'http://tairea.io'
+            //                         },
+            //                         {
+            //                             linkName: 'Link to video',
+            //                             linkUrl: 'http://tairea.io'
+            //                         },
+            //                     ]
+            //                 }
+            //             ]
+            //         }
+            //     ]
             }
         },
         watch: {
@@ -198,6 +195,9 @@
                     store.dispatch('getProfilePic', staff.given_name.toLowerCase())
                 }
             }
+        },
+        computed: {
+            ...mapState(['user', 'staff', 'profilePicUrl', 'modules']),
         },
         methods: {
             ...mapActions(['saveModuletoFirestore']),
@@ -229,15 +229,28 @@
                 moduleObj.yearName = year_name
                 moduleObj.teacher = this.staff.family_name
                 this.saveModuletoFirestore(moduleObj)
-
             },
+            getModulesForThisClass(year_name)  {
+                var result = this.modules.filter(obj => {
+                    return obj.yearName === year_name
+                })
+                return result
+            }
 
         },
         mounted() {
             // TODO: bind only once at the beginning. not everytime mounted. (maybe local storage)
             store.dispatch('bindStaff', this.user.email).then(() => {
                 store.commit('mapStaffData')
+                // TODO: bindModulesByStaff 
+                store.dispatch('bindModulesByStaff', this.staff.family_name)
+                .then(() => {
+                    // store.commit('mapModulesByStaff')
+                    console.log("logging modules for this staff: ", this.modules)
+                })
             })
+
+            
         }
 
     }

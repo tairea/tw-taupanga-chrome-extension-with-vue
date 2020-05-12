@@ -32,6 +32,7 @@ export default new Vuex.Store({
     staffs: [],
     staff: {},
     todos: [],
+    modules: [],
     nsn: '123',
     profilePicUrl: '',
     modulePicUrl: null,
@@ -66,6 +67,10 @@ export default new Vuex.Store({
       state.staff = state.staffs[0]
       console.log(state.staff)
     },
+    // mapStaffModules(state) {
+    //   console.log("save staff modules to state")
+    //   state.modules = 
+    // },
     modulePicUrl(state, url) {
       console.log("mapping staff")
       state.modulePicUrl = url
@@ -89,9 +94,9 @@ export default new Vuex.Store({
       console.log("vuexfire bindTodos triggered. with = " + nsn)
       return bindFirestoreRef('todos', firebaseDb.collection('students/' + nsn + '/todos2020'))
     }),
-    bindModules: firestoreAction(({ bindFirestoreRef }, number) => {
-      console.log("vuexfire bindModules triggered. with = " + number)
-      return bindFirestoreRef('todos', firebaseDb.collection('students/' + number + '/todos2020'))
+    bindModulesByStaff: firestoreAction(({ bindFirestoreRef }, teacherLastName) => {
+      console.log("vuexfire bindModules triggered. with = " + teacherLastName)
+      return bindFirestoreRef('modules', firebaseDb.collection('taupanga-modules/').where("teacher", "==", teacherLastName));
     }),
     getProfilePic({ commit }, name) {
       firebaseStorage.ref('taiohi/' + name + '.png').getDownloadURL().then(function (url) {

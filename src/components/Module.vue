@@ -5,12 +5,12 @@
         <div class="flex">
           <!-- <div class="module-title-col"> -->
           <p class="title is-size-4">
-            {{ module.title }}
+            {{ module.moduleName }}
           </p>
           <!-- </div> -->
         </div>
         <p class="subtitle is-size-6" style="margin-top: 5px;">
-          {{ module.milestones.length }} Milestones
+          {{ module.moduleMilestones.length }} Milestones
         </p>
         <div class="flex" style="justify-content: space-between;">
           <b-button type="is-info" size="is-small" outlined @click="$emit('editModule', module)">
@@ -21,7 +21,7 @@
           </b-button>
         </div>
         <div class="module-pic-col">
-          <img src="https://picsum.photos/100/100" class="module-pic">
+          <img :src="module.modulePic" class="module-pic">
         </div>
       </div>
       <footer class="card-footer">
@@ -35,7 +35,7 @@
 </template>
 
 <script>
-  import store from '../../../store'
+  import store from '../store'
   import { mapState, mapActions } from 'vuex'
 
   export default {
