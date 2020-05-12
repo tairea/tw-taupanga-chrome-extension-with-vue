@@ -4,11 +4,11 @@
       <div class="card-content">
         <div class="flex">
           <div class="module-title-col">
-            <b-field label="Module Name">
-              <b-input v-model="moduleName" placeholder="Name Module" icon="rocket"></b-input>
+            <b-field label="Edit Module Name">
+              <b-input v-model="moduleName" icon="rocket" value="moduleName"></b-input>
             </b-field>
-            <b-field label="Due Date">
-              <b-datepicker v-model="moduleDate" placeholder="Set due date" icon="calendar-alt" trap-focus>
+            <b-field label="Edit Due Date">
+              <b-datepicker v-model="moduleDate" icon="calendar-alt" trap-focus value="moduleDate">
               </b-datepicker>
             </b-field>
           </div>
@@ -44,7 +44,6 @@
 </template>
 
 <script>
-  import VueCircle from 'vue2-circle-progress/src/index.vue'
   import store from '../store'
   import {
     mapState,
@@ -52,17 +51,17 @@
   } from 'vuex'
 
   export default {
-    name: "AddModule",
-    props: ['className', 'yearName'],
+    name: "EditModule",
+    props: ['module','className', 'yearName'],
     components: {
-      VueCircle
+
     },
     data() {
       return {
         file: null,
-        moduleName: null,
-        moduleDate: null,
-        modulePic: null,
+        moduleName: this.module.moduleName,
+        moduleDate: this.calcDate(),
+        modulePic: this.module.modulePic,
         circleProgress: 0,
         fill: {
           gradient: ["red", "green", "blue"]
@@ -70,7 +69,7 @@
       }
     },
     mounted() {
-
+      console.log("from within module EDIT: ", this.module)
     },
     watch: {
       modulePicUrl: function (url) {
@@ -88,8 +87,14 @@
     },
     methods: {
       ...mapActions(['saveModulePic']),
+      calcDate() {
+        // convert seconds to date
+        var epoch = new Date(0);
+        epoch.setSeconds(parseInt(this.module.moduleDate.seconds));
+        var date = epoch.toISOString();
+        return new Date(date)
+      },
       percentComplete() {
-        console.log("loading percentage")
         return 75
       },
       uploadModuleImg() {

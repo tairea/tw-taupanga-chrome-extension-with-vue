@@ -106,11 +106,11 @@ export default new Vuex.Store({
         console.log("error: " + err.message)
       })
     },
-    saveModulePic({ commit }, file) {
+    saveModulePic({ commit }, newModule) {
       // ceate a storage ref
-      var storageRef = firebaseStorage.ref("module-pics/" + file.name);
+      var storageRef = firebaseStorage.ref("module-pics/" + newModule.class + "_" + newModule.year + "_" + newModule.file.name );
       // upload a file
-      var task = storageRef.put(file);
+      var task = storageRef.put(newModule.file);
       // update progress bar
       task.on(
         "state_changed",

@@ -23,8 +23,9 @@
                         <!-- <transition name="backward" mode="out-in"> -->
                             <ViewModule v-else-if="viewModuleFlag" :module="selectedModule" @back="showModules()" />
 
+                            <EditModule v-else-if="editModuleFlag" :module="selectedModule" :className="classGroup.class_name" :yearName="classGroup.year_name" @close="showModules()" @saveModule="saveModule($event,classGroup.year_name,classGroup.class_name)" />
                             
-                            <AddModule v-else-if="addModuleFlag" @close="showModules()" @saveModule="saveModule($event,classGroup.year_name,classGroup.class_name)" />
+                            <AddModule v-else-if="addModuleFlag" :className="classGroup.class_name" :yearName="classGroup.year_name" @close="showModules()" @saveModule="saveModule($event,classGroup.year_name,classGroup.class_name)" />
                         </transition>
 
 
@@ -35,6 +36,7 @@
                             <b-icon icon="plus" size="is-large" type="is-grey-light">
                             </b-icon>
                         </div>
+
                         <div v-else-if="addMilestoneButton" class="addButton" @click="addMilestone()">
                             <b-icon icon="plus" size="is-large" type="is-grey-light">
                             </b-icon>
@@ -59,6 +61,7 @@
     import Module from "../../../components/Module.vue";
     import ViewModule from "../../../components/ViewModule.vue";
     import AddModule from "../../../components/AddModule.vue";
+    import EditModule from "../../../components/EditModule.vue";
 
     export default {
         name: "Teacher",
@@ -66,6 +69,7 @@
             Module,
             ViewModule,
             AddModule,
+            EditModule,
         },
         data() {
             return {
@@ -73,113 +77,10 @@
                 showModulesFlag: true,
                 viewModuleFlag: false,
                 addModuleFlag: false,
+                editModuleFlag: false,
                 selectedModule: null,
-                selectedModuleId: null,
                 addModuleButton: true,
                 addMilestoneButton: false,
-            //     modules: [{
-            //             id: 123,
-            //             title: 'Website',
-            //             subject: 'Innovation',
-            //             milestones: [{
-            //                     milestoneName: 'milestone 1',
-            //                     milestoneInstructions: 'Please read this document',
-            //                     milestoneCompleted: false,
-            //                     milestoneSubmission: '',
-            //                     milestoneLinks: [{
-            //                             linkName: 'Instructions doc',
-            //                             linkUrl: 'http://tairea.io'
-            //                         },
-            //                         {
-            //                             linkName: 'Link to video',
-            //                             linkUrl: 'http://tairea.io'
-            //                         },
-            //                     ]
-            //                 },
-            //                 {
-            //                     milestoneName: 'milestone 2',
-            //                     milestoneInstructions: 'Complete these activities',
-            //                     milestoneCompleted: false,
-            //                     milestoneSubmission: '',
-            //                     milestoneLinks: [{
-            //                             linkName: 'Activities doc',
-            //                             linkUrl: 'http://tairea.io'
-            //                         },
-            //                         {
-            //                             linkName: 'Link to video',
-            //                             linkUrl: 'http://tairea.io'
-            //                         },
-            //                     ]
-            //                 },
-            //                 {
-            //                     milestoneName: 'milestone 3',
-            //                     milestoneInstructions: 'Please read this document',
-            //                     milestoneCompleted: false,
-            //                     milestoneSubmission: '',
-            //                     milestoneLinks: [{
-            //                             linkName: 'Instructions doc',
-            //                             linkUrl: 'http://tairea.io'
-            //                         },
-            //                         {
-            //                             linkName: 'Link to video',
-            //                             linkUrl: 'http://tairea.io'
-            //                         },
-            //                     ]
-            //                 }
-            //             ]
-            //         },
-            //         {
-            //             id: 456,
-            //             title: 'VR Project',
-            //             subject: 'Innovation',
-            //             milestones: [{
-            //                     milestoneName: 'milestone 1',
-            //                     milestoneInstructions: 'Please read this document',
-            //                     milestoneCompleted: false,
-            //                     milestoneSubmission: '',
-            //                     milestoneLinks: [{
-            //                             linkName: 'Instructions doc',
-            //                             linkUrl: 'http://tairea.io'
-            //                         },
-            //                         {
-            //                             linkName: 'Link to video',
-            //                             linkUrl: 'http://tairea.io'
-            //                         },
-            //                     ]
-            //                 },
-            //                 {
-            //                     milestoneName: 'milestone 2',
-            //                     milestoneInstructions: 'Complete these activities',
-            //                     milestoneCompleted: false,
-            //                     milestoneSubmission: '',
-            //                     milestoneLinks: [{
-            //                             linkName: 'Activities doc',
-            //                             linkUrl: 'http://tairea.io'
-            //                         },
-            //                         {
-            //                             linkName: 'Link to video',
-            //                             linkUrl: 'http://tairea.io'
-            //                         },
-            //                     ]
-            //                 },
-            //                 {
-            //                     milestoneName: 'milestone 3',
-            //                     milestoneInstructions: 'Please read this document',
-            //                     milestoneCompleted: false,
-            //                     milestoneSubmission: '',
-            //                     milestoneLinks: [{
-            //                             linkName: 'Instructions doc',
-            //                             linkUrl: 'http://tairea.io'
-            //                         },
-            //                         {
-            //                             linkName: 'Link to video',
-            //                             linkUrl: 'http://tairea.io'
-            //                         },
-            //                     ]
-            //                 }
-            //             ]
-            //         }
-            //     ]
             }
         },
         watch: {
@@ -217,17 +118,36 @@
                 this.addMilestoneButton = true
             },
             addModule() {
+                // hide other views
                 this.showModulesFlag = false;
                 this.viewModuleFlag = false;
+                this.editModuleFlag = false;
+                // hide buttons
                 this.addModuleButton = false;
                 this.addMilestoneButton = false;
+                // show view
                 this.addModuleFlag = true;
+            },
+            editModule(module) {
+                console.log("from emit: ", module)
+                // hide other views
+                this.showModulesFlag = false;
+                this.viewModuleFlag = false;
+                this.addModuleFlag = false;
+                // hide buttons
+                this.addModuleButton = false;
+                this.addMilestoneButton = false;
+                // set seleted module
+                this.selectedModule = module;
+                // show view
+                this.editModuleFlag = true;
             },
             saveModule(moduleObj,year_name,class_name) {
                 this.showModules()
                 moduleObj.className = class_name
                 moduleObj.yearName = year_name
                 moduleObj.teacher = this.staff.family_name
+                moduleObj.moduleMilestones = []
                 this.saveModuletoFirestore(moduleObj)
             },
             getModulesForThisClass(year_name)  {
