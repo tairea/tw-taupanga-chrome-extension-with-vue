@@ -1,6 +1,7 @@
 <template>
+  <div>
     <!-- MILESTONES -->
-    <div v-for="(milestone, index) in module.moduleMilestones" :key="index" class="card" style="margin: 20px;">
+    <div v-for="(milestone, index) in milestones" :key="index" class="card" style="margin: 20px;">
       <div class="card-content">
         <div class="flex">
           <div class="milestone-number">
@@ -23,31 +24,13 @@
         </p>
       </footer>
     </div>
+  </div>
 </template>
-
-<!-- 
-  milestoneName
-  milestoneInstructions
-  milestoneLinks [
-    {
-      name: String,
-      link: URL
-    }
-  ]
-  
-  milestoneHasActivityAndSubmission: Bool
-
-  milestoneActivityInstructions: 
-  milestoneActivitySubmission: Boolean
-  milestoneIsSubmitted: Boolean
-
-
- -->
 
 <script>
   export default {
     name: "Milestones",
-    props: ['module'],
+    props: ['milestones'],
     components: {
 
     },
@@ -56,8 +39,7 @@
 
       }
     },
-    mounted() {
-    },
+    mounted() {},
     computed: {
 
     },
@@ -76,7 +58,6 @@
 </style>
 
 <style scoped>
-
   .flex {
     display: flex;
   }
@@ -94,5 +75,4 @@
   .milestone-title-col {
     padding-left: 24px;
   }
-
 </style>

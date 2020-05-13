@@ -140,6 +140,16 @@ export default new Vuex.Store({
       .catch(function(error) {
         console.error("Error writing document: ", error);
       });
+    },
+    saveMilestonetoFirestore({},moduleObj) {
+      console.log("in store: saving to firestore: ", moduleObj)
+      firebaseDb.collection("taupanga-modules/").doc(moduleObj.className+"_"+moduleObj.yearName+"_"+moduleObj.moduleName).update(moduleObj)
+      .then(function() {
+        console.log("Document successfully written!");
+      })
+      .catch(function(error) {
+        console.error("Error writing document: ", error);
+      });
     }
   },
 })

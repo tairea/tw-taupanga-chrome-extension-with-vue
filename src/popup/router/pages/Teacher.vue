@@ -21,7 +21,7 @@
                             <EditModule v-else-if="editModuleFlag" :module="selectedModule" :className="classGroup.class_name" :yearName="classGroup.year_name" @close="showModules()" @saveModule="saveModule($event,classGroup.year_name,classGroup.class_name)" />
                         
                             <ViewMilestones v-else-if="viewMilestonesFlag" :module="selectedModule" @addMilestone="addMilestone($event)" @back="showModules()" />
-                            <AddMilestone v-else-if="addMilestoneFlag" :module="selectedModule" @back="showModules()" @saveMilestone="saveMilestone($event,classGroup.year_name,classGroup.class_name)" />
+                            <AddMilestone v-else-if="addMilestoneFlag" :module="selectedModule" @back="showModules()" @backToModule="viewMilestones($event)" @saveMilestone="saveMilestone($event)" />
                             
                         </transition>
 
@@ -96,7 +96,7 @@
             ...mapState(['user', 'staff', 'profilePicUrl', 'modules']),
         },
         methods: {
-            ...mapActions(['saveModuletoFirestore']),
+            ...mapActions(['saveModuletoFirestore','saveMilestonetoFirestore']),
             hideAllViewsAndButtons() {
                 this.showModulesFlag = false
                 // this.viewModuleFlag = false
@@ -165,14 +165,15 @@
                 })
                 return result
             },
-            saveMilestone(milestoneObj,year_name,class_name) {
+            async saveMilestone(args) {
+                const milestoneObj = args.milestone
+                const moduleObj = args.module
                 // TODO: need module details to save milestone to right place
-                // this.showModules()
-                // milestoneObj.className = class_name
-                // milestoneObj.yearName = year_name
-                // milestoneObj.teacher = this.staff.family_name
-                // milestoneObj.moduleMilestones = []
-                // this.saveMilestonetoFirestore(moduleObj)
+                console.log("Milestone", milestoneObj)
+                console.log("Module", moduleObj)
+                moduleObj.moduleMilestones.push(milestoneObj)
+                await this.saveMilestonetoFirestore(moduleObj)
+                this.viewMilestones()
             },
 
         },
