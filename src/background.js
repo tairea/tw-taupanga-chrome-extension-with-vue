@@ -6,7 +6,6 @@ import 'firebase/storage'
 import router from './popup/router'
 
 import store from './store'
-// alert(`Hello ${store.getters.foo}!`)
 
 // Initialize Firebase
 var config = {

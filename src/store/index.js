@@ -27,6 +27,7 @@ export default new Vuex.Store({
     },
     loggedIn: false,
     studentOrStaff: 'student',
+    allStudents: [],
     students: [],
     student: {},
     staffs: [],
@@ -55,6 +56,34 @@ export default new Vuex.Store({
     storeProfilePic(state, picUrl) {
       state.profilePicUrl = picUrl
     },
+    storeProfilePicForMany(state, allProfilePics) {
+
+      var result = state.allStudents;
+      var profilePics = allProfilePics.slice(0);
+
+      console.log("result length:", result.length)
+      console.log("allProfilePics length:", profilePics.length)
+      console.log(profilePics)
+
+      for (var i = 0 ; i < result.length ; i++){
+        if (!result[i].given_name) {continue}
+        var studentName = result[i].given_name.toLowerCase()
+        console.log("matching " + studentName + "...")
+        for (var j = 0; j < profilePics.length ; j++){
+          var picName = profilePics[j].name.split(".")[0]
+          var picUrl = profilePics[j].url
+          if ( studentName == picName ){
+            console.log(profilePics[j])
+            console.log(studentName + " and " + picName + " are a MATCH.")
+            console.log("Assigning url: ", picUrl)
+            result[i].profilePic = picUrl;
+          }
+        }; 
+
+      };
+      console.log(result);
+      state.allStudents = result
+    },
     storeModulePicProgress(state, percentage) {
       state.modulePicProgress = percentage
     },
@@ -81,11 +110,12 @@ export default new Vuex.Store({
       // return the promise returned by `bindFirestoreRef`
       return bindFirestoreRef('students', firebaseDb.collection('students').where("email", "array-contains", userEmail))
     }),
-    bindStaff: firestoreAction(({
-      bindFirestoreRef
-    }, userEmail) => {
+    bindStaff: firestoreAction(({ bindFirestoreRef }, userEmail) => {
       // return the promise returned by `bindFirestoreRef`
       return bindFirestoreRef('staffs', firebaseDb.collection('staff').where("email", "==", userEmail))
+    }),
+    bindAllStudents: firestoreAction(({ bindFirestoreRef }) => {
+      return bindFirestoreRef('allStudents', firebaseDb.collection('students'))
     }),
     bindTodos: firestoreAction(({ bindFirestoreRef }, nsn) => {
       console.log("vuexfire bindTodos triggered. with = " + nsn)
@@ -111,6 +141,40 @@ export default new Vuex.Store({
       }).catch((err) => {
         console.log("error: " + err.message)
       })
+    },
+    getProfilePicForMany({ commit }) {
+      const allProfilePics = []  
+      var storageRef = firebaseStorage.ref();
+
+      // Find all the prefixes and items.
+      storageRef
+        .child("taiohi")
+        .listAll()
+        .then(function(res) {    
+          res.items.forEach( (itemRef) => {
+            const picObj = {}
+            picObj.name = itemRef.name;
+            itemRef.getDownloadURL().then(function(url) {
+              picObj.url = url
+            });
+            // console.log("got url for " + picObj.picName, picObj.picUrl)
+            allProfilePics.push(picObj)
+          });
+          console.log(allProfilePics)
+          commit('storeProfilePicForMany', allProfilePics)
+        })
+        .catch(function(error) {
+          // Uh-oh, an error occurred!
+          console.log(error)
+        });
+        
+
+        // firebaseStorage.ref('taiohi/' + args.name + '.png').getDownloadURL().then(function (url) {
+        //   console.log("retireved pic for: " + args.name)
+        //   commit('storeProfilePicForMany', { url:url, nsn: args.nan })
+        // }).catch((err) => {
+        //   console.log("error: " + err.message)
+        // })
     },
     saveModulePic({ commit }, newModule) {
       // ceate a storage ref

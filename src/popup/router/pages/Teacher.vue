@@ -87,6 +87,7 @@
 							v-if="showClassesFlag" 
 							:classes="classes" 
 							@editClass="editClass($event)"
+							@viewClass="viewClass($event)"
 						/>
 
 						<EditClass 
@@ -98,6 +99,14 @@
 							@saveClass="saveClass($event)"
 							@delete="removeSelectedClass($event)" 
 						/>
+
+						<ViewClass 
+							v-if="viewClassFlag" 
+							:classGroup="selectedClass"
+							@close="closeClassView()"
+							@saveClass="saveClass($event)"
+						/>
+
 						<!-- <AddStudentsToClass v-else-if="addStudentsFlag" /> -->
 
 					</transition>
@@ -123,6 +132,7 @@
 
 	import Class from "../../../components/Class.vue";
 	import EditClass from "../../../components/EditClass.vue";
+	import ViewClass from "../../../components/ViewClass.vue";
 	// import AddStudentsToClass from "../../../components/AddStudentsToClass.vue";
 
 	import Module from "../../../components/Module.vue";
@@ -139,6 +149,7 @@
 		components: {
 			Class,
 			EditClass,
+			ViewClass,
 			// AddStudentsToClass,
 			Module,
 			AddModule,
@@ -163,6 +174,7 @@
 				showClassesFlag: false,
 				saveClassFlag: false,
 				addStudentsFlag: false,
+				viewClassFlag: false,
 				// BUTTONS
 				addModuleButton: true,
 				classButtonFlag: false,
@@ -174,6 +186,7 @@
 				// IS EDITING FLAGS
 				isEditingClass: false,
 				isEditingMilestone: false,
+				
 			}
 		},
 		mounted() {
@@ -371,7 +384,25 @@
 				this.isEditingClass = false
 				this.selectedClass = null;
 				this.showClasses()
-			}
+			},
+			viewClass(classObj) {
+				this.hideAllViewsAndButtons()
+				this.selectedClass = classObj
+				this.viewClassFlag = true
+			},
+			saveClass (args) {
+				// TODO: bind the students nsn's into this class
+				/*
+				const classObj = args.classGroup
+				const nsnArray = args.nsnArray
+				classObj.students = nsnArray
+				*/
+			},
+			closeClassView() {
+				this.viewClassFlag = false
+				this.selectedClass = null;
+				this.showClasses()
+			},
 		},
 	}
 </script>
