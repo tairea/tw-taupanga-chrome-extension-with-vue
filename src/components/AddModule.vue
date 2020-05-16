@@ -95,7 +95,7 @@
         const moduleObj = {
           moduleName: this.moduleName,
           moduleDate: this.moduleDate,
-          modulePic: this.modulePic
+          modulePic: this.modulePic 
         }
         this.$emit('saveModule', moduleObj)
       }

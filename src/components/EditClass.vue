@@ -13,7 +13,7 @@
           </div>
           <div class="class-color-col">
             <div class="color-icon-wrap" :style="{backgroundColor: color}">
-            <v-swatches v-model="color" :swatches="swatches" shapes="circles">
+              <v-swatches v-model="color" :swatches="swatches" shapes="circles">
                 <b-icon class="class-icon" slot="trigger" type="is-white" icon="palette"></b-icon>
               </v-swatches>
             </div>
@@ -22,14 +22,21 @@
       </div>
 
     </div>
-    <div class="flex" style="justify-content: center; align-items: center; margin-top: 10px; margin-bottom: 50px;">
+    <div class="flex" style="justify-content: center; align-items: center; margin-top: 10px;">
       <b-button type="is-dark" size="is-medium" outlined @click="$emit('close')" class="button-margin-10">
         Cancel
       </b-button>
-      <b-button type="is-warning" size="is-medium" outlined @click="emitNewClassDetails()">
+      <b-button type="is-warning" size="is-medium" @click="emitNewClassDetails()">
         Save Class
       </b-button>
     </div>
+    <div v-if="isEditing" class="flex" style="justify-content: center; align-items: center;">
+      <b-button type="is-danger" size="is-small" outlined @click="deleteClassModal()"
+        @delete="$emit('delete', selectedClass)">
+        Delete Class
+      </b-button>
+    </div>
+    <div style="margin-bottom:50px;"></div>
   </div>
 </template>
 
@@ -42,17 +49,19 @@
   import VSwatches from 'vue-swatches'
 
   export default {
-    name: "NameClass",
-    props: ['classes', 'teacher'],
+    name: "EditClass",
+    props: ['classes', 'teacher', 'isEditing', 'selectedClass'],
     components: {
-      VSwatches
+      VSwatches,
     },
     data() {
       return {
-        teachersClassName: null,
-        studentsClassName: null,
-        color: '#ffdd57',
-        swatches: ['hsl(14, 100%, 53%)', 'hsl(48, 100%, 67%)', 'hsl(141, 53%, 53%)', 'hsl(171, 100%, 41%)', 'hsl(204, 71%, 53%)', 'hsl(217, 71%, 53%)', 'hsl(271, 100%, 71%)', 'hsl(348, 86%, 61%)']
+        teachersClassName: this.selectedClass ? this.selectedClass.year_name : null,
+        studentsClassName: this.selectedClass ? this.selectedClass.class_name : null,
+        color: this.selectedClass ? this.selectedClass.color : '#ffdd57',
+        swatches: ['hsl(14, 100%, 53%)', 'hsl(48, 100%, 67%)', 'hsl(141, 53%, 53%)', 'hsl(171, 100%, 41%)',
+          'hsl(204, 71%, 53%)', 'hsl(217, 71%, 53%)', 'hsl(271, 100%, 71%)', 'hsl(348, 86%, 61%)'
+        ]
       }
     },
     mounted() {
@@ -74,13 +83,26 @@
           color: this.color
         }
         this.$emit('saveClass', classObj)
+      },
+      deleteClassModal() {
+        this.$buefy.dialog.confirm({
+          title: 'Deleting class',
+          message: 'Are you sure you want to <b>delete</b> this Class?<br>You could lose all Modules & Milestones<br>This action cannot be undone.',
+          confirmText: 'Delete Class',
+          type: 'is-danger',
+          hasIcon: true,
+          onConfirm: () =>  {
+            this.$emit('delete', this.selectedClass)
+            this.$buefy.toast.open('Account deleted!')
+          }
+        })
       }
     }
   }
 </script>
 
 <style>
-.labelSize > .label {
+  .labelSize>.label {
     font-size: 0.9rem !important;
   }
 </style>
@@ -105,7 +127,7 @@
     flex-direction: column;
     justify-content: center;
     align-items: center; */
-    padding-top:20px;
+    padding-top: 20px;
     padding-left: 1.5rem;
   }
 
@@ -123,6 +145,4 @@
   .button-margin-10 {
     margin: 10px;
   }
-
-  
 </style>

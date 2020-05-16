@@ -15,15 +15,15 @@
       </div>
     </div>
     <div class="flex milestone-banner">
-        <div class="milestone-banner-number">
-          <h1>{{module.moduleMilestones.length + 1}}</h1>
-        </div>
-        <div class="milestone-banner-title-col">
-          <p class="title is-6">
-            {{ milestoneName }}
-          </p>
-        </div>
+      <div class="milestone-banner-number">
+        <h1>{{module.moduleMilestones.length + 1}}</h1>
       </div>
+      <div class="milestone-banner-title-col">
+        <p class="title is-6">
+          {{ milestoneName }}
+        </p>
+      </div>
+    </div>
 
     <div class="card" style="margin: 20px;">
       <div class="card-content">
@@ -61,7 +61,7 @@
 
           <!-- Enable Activity -->
           <div class="field flex-center">
-            <b-checkbox v-model="activityEnabled" size="is-small" type="is-dark">Add Activity & Submission
+            <b-checkbox v-model="activityEnabled" size="is-small" type="is-info">Add Activity & Submission
             </b-checkbox>
           </div>
 
@@ -77,7 +77,7 @@
               </b-input>
             </b-field>
 
-            <div class="field flex">
+            <div class="field flex-center">
               <b-checkbox v-model="submissionRequired" size="is-small">Submission required</b-checkbox>
             </div>
           </div>
@@ -85,16 +85,15 @@
           <hr style="width: 100%; margin-bottom: 0;">
 
         </div>
-
       </div>
-      <div class="flex" style="justify-content: center; align-items: center; margin-top: 10px; margin-bottom: 50px;">
-        <b-button type="is-dark" size="is-medium" outlined @click="$emit('close')" class="button-margin-10">
-          Cancel
-        </b-button>
-        <b-button type="is-info" size="is-medium" outlined @click="emitNewMilestoneDetails()">
-          Save New Milestone
-        </b-button>
-      </div>
+    </div>
+    <div class="flex" style="justify-content: center; align-items: center; margin-top: 10px; margin-bottom: 50px;">
+      <b-button type="is-dark" size="is-medium" outlined @click="$emit('backToModule', module)" class="button-margin-10">
+        Cancel
+      </b-button>
+      <b-button type="is-info" size="is-medium" outlined @click="emitNewMilestoneDetails()">
+        Save New Milestone
+      </b-button>
     </div>
   </div>
 </template>
@@ -166,7 +165,10 @@
           milestoneObj.activityInstructions = this.activityInstructions
           milestoneObj.submissionRequired = this.submissionRequired
         }
-        this.$emit('saveMilestone', {milestone: milestoneObj, module:this.module})
+        this.$emit('saveMilestone', {
+          milestone: milestoneObj,
+          module: this.module
+        })
         // this.checkMilestoneLinks()
       },
       // checkMilestoneLinks() {

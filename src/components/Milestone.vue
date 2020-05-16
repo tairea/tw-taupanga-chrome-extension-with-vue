@@ -1,7 +1,7 @@
 <template>
   <div>
     <!-- MILESTONES -->
-    <div v-for="(milestone, index) in milestones" :key="index" class="card" style="margin: 20px;">
+    <div v-for="(milestone, index) in module.moduleMilestones" :key="index" class="card" style="margin: 20px;" @click="editMilestone(milestone, index)">
       <div class="card-content">
         <div class="flex">
           <div class="milestone-number">
@@ -30,7 +30,7 @@
 <script>
   export default {
     name: "Milestones",
-    props: ['milestones'],
+    props: ['module'],
     components: {
 
     },
@@ -44,6 +44,9 @@
 
     },
     methods: {
+      editMilestone (milestone, index) {
+        this.$emit('editMilestone', {milestone: milestone, index:index})
+      },
       percentComplete() {
         return 75
       }
@@ -63,7 +66,7 @@
   }
 
   .milestone-number {
-    width: 40px;
+    min-width: 40px;
     height: 40px;
     border: 1px solid rgba(0, 0, 0, 0.6);
     border-radius: 50%;

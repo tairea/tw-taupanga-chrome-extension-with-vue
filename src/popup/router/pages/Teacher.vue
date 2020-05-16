@@ -9,27 +9,62 @@
 
 		<section>
 			<!-- CLASSES NAV -->
-			<b-tabs v-model="activeTab">
+			<b-tabs v-model="activeTab" @input="tabClicked($event)">
 				<template v-for="(classGroup, index) in classes">
 					<b-tab-item :key="index" :label="classGroup.year_name" ref="tab">
 
 						<!-- MODULE COMPONENTS -->
 						<transition name="dip" mode="out-in">
 
-							<Module v-if="showModulesFlag" :modules="getModulesForThisClass(classGroup.year_name)"
-								@viewMilestones="viewMilestones($event)" @editModule="editModule($event)" />
-							<AddModule v-else-if="addModuleFlag" :className="classGroup.class_name"
-								:yearName="classGroup.year_name" @close="showModules()"
-								@saveModule="saveModule($event,classGroup.year_name,classGroup.class_name)" />
-							<EditModule v-else-if="editModuleFlag" :module="selectedModule"
-								:className="classGroup.class_name" :yearName="classGroup.year_name"
+							<!-- ======= MODULES ======= -->
+							<Module 
+								v-if="showModulesFlag" 
+								:modules="getModulesForThisClass(classGroup.year_name)"
+								@viewMilestones="viewMilestones($event)" 
+								@editModule="editModule($event)" 
+							/>
+							<AddModule 
+								v-else-if="addModuleFlag" 
+								:className="classGroup.class_name"
+								:yearName="classGroup.year_name" 
 								@close="showModules()"
-								@saveModule="saveModule($event,classGroup.year_name,classGroup.class_name)" />
+								@saveModule="saveModule($event,classGroup.year_name,classGroup.class_name)" 
+							/>
+							<EditModule 
+								v-else-if="editModuleFlag" 
+								:module="selectedModule"
+								:className="classGroup.class_name" 
+								:yearName="classGroup.year_name"
+								@close="showModules()"
+								@saveModule="saveModule($event,classGroup.year_name,classGroup.class_name)" 
+							/>
 
-							<ViewMilestones v-else-if="viewMilestonesFlag" :module="selectedModule"
-								@addMilestone="addMilestone($event)" @back="showModules()" />
-							<AddMilestone v-else-if="addMilestoneFlag" :module="selectedModule" @back="showModules()"
-								@backToModule="viewMilestones($event)" @saveMilestone="saveMilestone($event)" />
+							<!-- ======= MILESTONES ======= -->
+							<ViewMilestones 
+								v-else-if="viewMilestonesFlag" 
+								:module="selectedModule"
+								@back="showModules()" 
+								@addMilestone="addMilestone($event)" 
+								@editMilestone="editMilestone($event)"
+							/>
+							<AddMilestone 
+								v-else-if="addMilestoneFlag" 
+								:module="selectedModule" 
+								@back="showModules()"
+								@backToModule="viewMilestones($event)" 
+								@saveMilestone="saveMilestone($event)" 
+							/>
+							<EditMilestone 
+								v-else-if="editMilestoneFlag" 
+								:module="selectedModule" 
+								:selectedMilestone="selectedMilestone" 
+								:selectedMilestoneIndex="selectedMilestoneIndex"
+								:isEditing="isEditingMilestone" 
+								@back="showModules()"
+								@backToModule="viewMilestones($event)" 
+								@updateMilestone="updateMilestone($event)" 
+								@delete="removeSelectedMilestone($event)" 
+							/>
 
 						</transition>
 
@@ -47,9 +82,22 @@
 
 					<transition name="dip" mode="out-in">
 
-						<Class v-if="showClassesFlag" :classes="classes" />
+						<!-- ======= CLASSES ======= -->
+						<Class 
+							v-if="showClassesFlag" 
+							:classes="classes" 
+							@editClass="editClass($event)"
+						/>
 
-						<NameClass v-else-if="saveClassFlag" :teacher="staff" @close="showClasses()" @saveClass="saveClass($event)" />
+						<EditClass 
+							v-else-if="saveClassFlag" 
+							:isEditing="isEditingClass" 
+							:selectedClass="selectedClass"
+							:teacher="staff" 
+							@close="closeClassEdit()" 
+							@saveClass="saveClass($event)"
+							@delete="removeSelectedClass($event)" 
+						/>
 						<!-- <AddStudentsToClass v-else-if="addStudentsFlag" /> -->
 
 					</transition>
@@ -74,7 +122,7 @@
 	} from 'vuex'
 
 	import Class from "../../../components/Class.vue";
-	import NameClass from "../../../components/NameClass.vue";
+	import EditClass from "../../../components/EditClass.vue";
 	// import AddStudentsToClass from "../../../components/AddStudentsToClass.vue";
 
 	import Module from "../../../components/Module.vue";
@@ -83,39 +131,49 @@
 
 	import ViewMilestones from "../../../components/ViewMilestones.vue";
 	import AddMilestone from "../../../components/AddMilestone.vue";
+	import EditMilestone from "../../../components/EditMilestone.vue";
 
 
 	export default {
 		name: "Teacher",
 		components: {
 			Class,
-			NameClass,
+			EditClass,
 			// AddStudentsToClass,
 			Module,
 			AddModule,
 			EditModule,
 			ViewMilestones,
-			AddMilestone
+			AddMilestone,
+			EditMilestone,
 		},
 		data() {
 			return {
 				activeTab: 0,
-				// flags to show/hide views
+				// MODULES
 				showModulesFlag: true,
 				// viewModuleFlag: false,
 				addModuleFlag: false,
 				editModuleFlag: false,
+				// MILESTONES
 				viewMilestonesFlag: false,
 				addMilestoneFlag: false,
-				// class show/hide flags
-				showClassesFlag: true,
+				editMilestoneFlag: false,
+				// CLASSES
+				showClassesFlag: false,
 				saveClassFlag: false,
 				addStudentsFlag: false,
-
+				// BUTTONS
 				addModuleButton: true,
-				classButtonFlag: true,
-
+				classButtonFlag: false,
+				// SELECTEDS
 				selectedModule: null,
+				selectedClass: null,
+				selectedMilestone: null,
+				selectedMilestoneIndex: null,
+				// IS EDITING FLAGS
+				isEditingClass: false,
+				isEditingMilestone: false,
 			}
 		},
 		mounted() {
@@ -131,7 +189,10 @@
 				store.dispatch('bindClassesByStaff', this.staff.family_name)
 					.then(() => {
 						// store.commit('mapModulesByStaff')
-						console.log("logging CLASSES for this staff: ", this.classes)
+						if (classes.length == 0) {
+							//if no classes then show add class ui
+							this.showClasses()
+						}
 					})
 			})
 		},
@@ -143,7 +204,8 @@
 					store.dispatch('getProfilePic', staff.given_name.toLowerCase())
 				}
 			},
-			classes: function(classes) {
+			classes: function (classes) {
+				console.log("classes changed")
 				this.activeTab = classes.length + 1
 			}
 		},
@@ -151,7 +213,17 @@
 			...mapState(['user', 'staff', 'profilePicUrl', 'modules', 'classes']),
 		},
 		methods: {
-			...mapActions(['saveModuletoFirestore', 'saveMilestonetoFirestore', 'saveClasstoFirestore']),
+			...mapActions(['saveModuletoFirestore', 'saveMilestonetoFirestore', 'saveClasstoFirestore',
+				'removeClassFromFirestore', 'removeMilestoneFromFirestore'
+			]),
+			tabClicked(i) {
+				if (this.classes.length == i) {
+					this.showClasses()
+				} else {
+					this.showModulesFlag = true;
+					this.addModuleButton = true;
+				}
+			},
 			hideAllViewsAndButtons() {
 				this.showModulesFlag = false
 				// this.viewModuleFlag = false
@@ -160,7 +232,11 @@
 				this.viewMilestonesFlag = false
 				// this.addMilestoneFlag = false
 				// this.addModuleButton = false
+				this.showClassesFlag = false
+				this.classButtonFlag = false
+				this.saveClassFlag = false
 			},
+			//======= MODULES =======
 			showModules() {
 				this.hideAllViewsAndButtons()
 				this.showModulesFlag = true;
@@ -189,6 +265,21 @@
 				this.editModuleFlag = true;
 				this.addModuleButton = false;
 			},
+			saveModule(moduleObj, year_name, class_name) {
+				this.showModules()
+				moduleObj.className = class_name
+				moduleObj.yearName = year_name
+				moduleObj.teacher = this.staff.family_name
+				moduleObj.moduleMilestones = []
+				this.saveModuletoFirestore(moduleObj)
+			},
+			getModulesForThisClass(year_name) {
+				var result = this.modules.filter(obj => {
+					return obj.yearName === year_name
+				})
+				return result
+			},
+			//======= MILESTONES =======
 			viewMilestones(module) {
 				this.hideAllViewsAndButtons()
 				// set seleted module
@@ -204,33 +295,51 @@
 				this.addMilestoneFlag = true;
 				this.addModuleButton = false;
 			},
-
-			saveModule(moduleObj, year_name, class_name) {
-				this.showModules()
-				moduleObj.className = class_name
-				moduleObj.yearName = year_name
-				moduleObj.teacher = this.staff.family_name
-				moduleObj.moduleMilestones = []
-				this.saveModuletoFirestore(moduleObj)
-			},
-			getModulesForThisClass(year_name) {
-				var result = this.modules.filter(obj => {
-					return obj.yearName === year_name
-				})
-				return result
+			editMilestone(args) {
+				const milestoneObj = args.milestone;
+				const index = args.index
+				this.hideAllViewsAndButtons()
+				// set seleted module
+				this.selectedMilestone = milestoneObj;
+				this.selectedMilestoneIndex = index;
+				// show views
+				this.isEditingMilestone = true
+				this.editMilestoneFlag = true;
+				this.addModuleButton = false;
 			},
 			async saveMilestone(args) {
 				const milestoneObj = args.milestone
 				const moduleObj = args.module
-				// TODO: need module details to save milestone to right place
-				console.log("Milestone", milestoneObj)
-				console.log("Module", moduleObj)
+				// add via push
 				moduleObj.moduleMilestones.push(milestoneObj)
 				await this.saveMilestonetoFirestore(moduleObj)
-				this.viewMilestones()
+				this.viewMilestones(moduleObj)
 			},
+			async updateMilestone(args) {
+				const milestoneObj = args.milestone
+				const moduleObj = args.module
+				const milestoneIndex = args.index
+				console.log("updating...")
+				console.log("module",moduleObj)
+				console.log("milestoneIndex",milestoneIndex)
+				console.log("milestoneObj",milestoneObj)
+				// update/replace via assignment
+				moduleObj.moduleMilestones[milestoneIndex] = milestoneObj
+				await this.saveMilestonetoFirestore(moduleObj)
+				this.viewMilestones(moduleObj)
+			},
+			async removeSelectedMilestone(args) {
+				const moduleObj = args.module
+				const index = args.index
+				moduleObj.moduleMilestones.splice(index, 1)
+				await this.saveMilestonetoFirestore(moduleObj)
+				this.isEditingMilestone = false
+				this.editMilestoneFlag = false;
+				this.viewMilestones(moduleObj)
+			},
+			//======= CLASSES =======
 			showClasses() {
-				this.saveClassFlag = false
+				this.hideAllViewsAndButtons()
 				this.showClassesFlag = true
 				this.classButtonFlag = true
 			},
@@ -245,6 +354,24 @@
 				console.log("saving Class to FS:", classObj)
 				this.saveClasstoFirestore(classObj)
 			},
+			editClass(classGroup) {
+				this.hideAllViewsAndButtons()
+				// set seleted module
+				console.log("Editing CLASS:", classGroup)
+				this.isEditingClass = true
+				this.selectedClass = classGroup;
+				// show view
+				this.saveClassFlag = true;
+			},
+			removeSelectedClass(classObj) {
+				this.showClasses()
+				this.removeClassFromFirestore(classObj)
+			},
+			closeClassEdit() {
+				this.isEditingClass = false
+				this.selectedClass = null;
+				this.showClasses()
+			}
 		},
 	}
 </script>

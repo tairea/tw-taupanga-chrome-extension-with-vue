@@ -4,7 +4,7 @@
     <ModuleBanner :module="module" @back="$emit('back')"/>
 
     <!-- MILESTONES -->
-    <Milestone :milestones="module.moduleMilestones"/>
+    <Milestone :module="module" @editMilestone="editMilestone($event)"/>
 
     <!-- ADD MILESTONE BUTTON -->
     <div class="addButton" @click="$emit('addMilestone', module)">
@@ -33,12 +33,14 @@
       }
     },
     mounted() {
-      console.log("module",this.module)
     },
     computed: {
 
     },
     methods: {
+      editMilestone (obj) {
+        this.$emit('editMilestone',obj)
+      },
       percentComplete() {
         return 75
       },

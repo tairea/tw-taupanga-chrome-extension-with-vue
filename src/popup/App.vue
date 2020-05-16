@@ -14,7 +14,7 @@ export default {
 
 <style>
 #app-width {
-  width: 350px;
+  width: 380px;
 }
 </style>
 

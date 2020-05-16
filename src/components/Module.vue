@@ -19,7 +19,7 @@
           </b-button>
         </div>
 
-        <div class="module-pic-col">
+        <div v-if="module.modulePic" class="module-pic-col">
           <img :src="module.modulePic" class="module-pic">
         </div>
 
@@ -79,7 +79,6 @@
         // calc diff between today and future due date
         var dateNow = new Date();
         var dateFuture = new Date(date);
-        console.log("future date as Date: ", dateFuture)
         var timeDiff = Math.abs(dateNow.getTime() - dateFuture.getTime());
         var dayDifference = Math.ceil(timeDiff / (1000 * 3600 * 24));
         if (dayDifference == 1) {

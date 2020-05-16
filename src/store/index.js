@@ -157,6 +157,16 @@ export default new Vuex.Store({
         console.error("Error writing document: ", error);
       });
     },
+    removeClassFromFirestore({},classObj) {
+      console.log("deleting CLASS to firestore:", classObj)
+      firebaseDb.collection("taupanga-classes/").doc(classObj.class_name+" - "+classObj.year_name).delete()
+      .then(function() {
+        console.log("Document successfully deleted!");
+      })
+      .catch(function(error) {
+        console.error("Error deleting document: ", error);
+      });
+    },
     saveMilestonetoFirestore({},moduleObj) {
       console.log("in store: saving to firestore: ", moduleObj)
       firebaseDb.collection("taupanga-modules/").doc(moduleObj.className+" - "+moduleObj.yearName+" - "+moduleObj.moduleName).update(moduleObj)
