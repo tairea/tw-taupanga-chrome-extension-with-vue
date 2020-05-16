@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div id="app-width">
     <router-view></router-view>
   </div>
 </template>
@@ -11,5 +11,11 @@ export default {
   }
 }
 </script>
+
+<style>
+#app-width {
+  width: 350px;
+}
+</style>
 
 

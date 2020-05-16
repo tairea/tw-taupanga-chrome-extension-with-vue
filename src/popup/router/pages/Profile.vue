@@ -10,7 +10,9 @@
 
         <!-- <p>{{ nsn }}</p> -->
 
-        <Todos :todos="todos"/>
+        <!-- <Todos :todos="todos"/> -->
+
+        <Module v-if="showModulesFlag" :modules="getModulesForThisClass(classGroup.year_name)" @viewMilestones="viewMilestones($event)" @editModule="editModule($event)" />
 
     </div>
 </template>
@@ -21,14 +23,23 @@
     import { mapState, mapActions } from 'vuex'
 
     import Todos from "../../../components/Todos.vue";
+    import Module from "../../../components/Module.vue";
 
     export default {
         name: "Profile",
         components: {
-            Todos
+            Todos,
+            Module
         },
-        computed: {
-            ...mapState(['user', 'student', 'nsn', 'todos', 'profilePicUrl']),
+        data () {
+            return {
+                showModulesFlag: true,
+            }
+        },
+        mounted () {
+            store.dispatch('bindStudent', this.user.email).then(() => {
+                store.commit('mapStudentData')
+            })
         },
         watch: {
             student: function (student) {
@@ -42,12 +53,18 @@
                 }
             }
         },
-        methods: {},
-        mounted() {
-            store.dispatch('bindStudent', this.user.email).then(() => {
-                store.commit('mapStudentData')
-            })
-        }
+        computed: {
+            ...mapState(['user', 'student', 'nsn', 'todos', 'profilePicUrl']),
+        },  
+        methods: {
+            getModulesForThisClass(year_name)  {
+                var result = this.modules.filter(obj => {
+                    return obj.yearName === year_name
+                })
+                return result
+            },
+        },
+        
 
     }
 </script>

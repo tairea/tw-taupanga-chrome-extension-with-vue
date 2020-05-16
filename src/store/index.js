@@ -33,6 +33,7 @@ export default new Vuex.Store({
     staff: {},
     todos: [],
     modules: [],
+    classes: [],
     nsn: '123',
     profilePicUrl: '',
     modulePicUrl: null,
@@ -67,10 +68,6 @@ export default new Vuex.Store({
       state.staff = state.staffs[0]
       console.log(state.staff)
     },
-    // mapStaffModules(state) {
-    //   console.log("save staff modules to state")
-    //   state.modules = 
-    // },
     modulePicUrl(state, url) {
       console.log("mapping staff")
       state.modulePicUrl = url
@@ -98,6 +95,15 @@ export default new Vuex.Store({
       console.log("vuexfire bindModules triggered. with = " + teacherLastName)
       return bindFirestoreRef('modules', firebaseDb.collection('taupanga-modules/').where("teacher", "==", teacherLastName));
     }),
+    // TODO: assign student to class then, get this students classes then bind those.
+    bindClassesByStaff: firestoreAction(({ bindFirestoreRef }, teacherLastName) => {
+      console.log("vuexfire bindClasses triggered. with = " + teacherLastName)
+      return bindFirestoreRef('classes', firebaseDb.collection('taupanga-classes/').where("teacher", "==", teacherLastName));
+    }),
+    // bindClassesByStudent: firestoreAction(({ bindFirestoreRef }, student) => {
+    //   console.log("vuexfire bindModules triggered. with = " + teacherLastName)
+    //   return bindFirestoreRef('classes', firebaseDb.collection('taupanga-classes/').where("className", "==", className).where("yearName", "==", yearName));
+    // }),
     getProfilePic({ commit }, name) {
       firebaseStorage.ref('taiohi/' + name + '.png').getDownloadURL().then(function (url) {
         console.log("got pic: " + url)
@@ -132,8 +138,18 @@ export default new Vuex.Store({
       );
     },
     saveModuletoFirestore({},moduleObj) {
-      console.log("in store: saving to firestore: ", moduleObj)
-      firebaseDb.collection("taupanga-modules/").doc(moduleObj.className+"_"+moduleObj.yearName+"_"+moduleObj.moduleName).set(moduleObj)
+      console.log("saving MODULE to firestore:", moduleObj)
+      firebaseDb.collection("taupanga-modules/").doc(moduleObj.className+" - "+moduleObj.yearName+" - "+moduleObj.moduleName).set(moduleObj)
+      .then(function() {
+        console.log("Document successfully written!");
+      })
+      .catch(function(error) {
+        console.error("Error writing document: ", error);
+      });
+    },
+    saveClasstoFirestore({},classObj) {
+      console.log("saving CLASS to firestore:", classObj)
+      firebaseDb.collection("taupanga-classes/").doc(classObj.class_name+" - "+classObj.year_name).set(classObj)
       .then(function() {
         console.log("Document successfully written!");
       })
@@ -143,7 +159,7 @@ export default new Vuex.Store({
     },
     saveMilestonetoFirestore({},moduleObj) {
       console.log("in store: saving to firestore: ", moduleObj)
-      firebaseDb.collection("taupanga-modules/").doc(moduleObj.className+"_"+moduleObj.yearName+"_"+moduleObj.moduleName).update(moduleObj)
+      firebaseDb.collection("taupanga-modules/").doc(moduleObj.className+" - "+moduleObj.yearName+" - "+moduleObj.moduleName).update(moduleObj)
       .then(function() {
         console.log("Document successfully written!");
       })
