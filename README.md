@@ -8,9 +8,11 @@ This custom Chrome Extension will enable Tai Wānanga teachers to track and moni
 - Vue
 - Vue-router 
 - Vuex
-- Firestore via vuexFire
+- Firebase Firestore via vuexFire
 - Firebase Authentication
+- Firebase Storage
 
+### XD Designs:
 ![TW Taupānga Designs](./screenshots/tw-taupanga-mockups.png)
 
 ### Inspired by:
