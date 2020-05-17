@@ -183,24 +183,24 @@ export default new Vuex.Store({
         console.error("Error writing document: ", error);
       });
     },
+
+
     saveClasstoFirestore({},classObj) {
-      console.log("saving CLASS to firestore:", classObj)
-      if (!classObj.id) {
-        const ref = firebaseDb.collection("taupanga-classes/").doc()
-        classObj.id = ref.id
-        console.log("getting new id for class = ", classObj.id)
-        firebaseDb.collection("taupanga-classes/").doc(classObj.teacher+"-"+classObj.id).set(classObj)
-        .then(function() { console.log("Document successfully written!");})
-        .catch(function(error) { console.error("Error writing document: ", error);})
+      if(!classObj.id) {
+        classObj.id = '_' + Math.random().toString(36).substr(2, 9);
+        console.log("id generated:", classObj.id)
       } else {
-        firebaseDb.collection("taupanga-classes/").doc(classObj.id).set(classObj)
-        .then(function() { console.log("Document successfully written!");})
-        .catch(function(error) { console.error("Error writing document: ", error);})
+        console.log("exisiting id is: ", classObj.id)
       }
+      firebaseDb.collection("taupanga-classes/").doc(classObj.id).set(classObj)
+      .then(function() { console.log("Document successfully written!");})
+      .catch(function(error) { console.error("Error writing document: ", error);})
     },
+
+
     removeClassFromFirestore({},classObj) {
       console.log("deleting CLASS from firestore: " + classObj.id)
-      firebaseDb.collection("taupanga-classes/").doc(classObj.teacher + "-" + classObj.id).delete()
+      firebaseDb.collection("taupanga-classes/").doc(classObj.id).delete()
       .then(function() { console.log("Document successfully deleted!"); })
       .catch(function(error) { console.error("Error deleting document: ", error);});
     },
@@ -213,7 +213,7 @@ export default new Vuex.Store({
       .catch(function(error) {
         console.error("Error writing document: ", error);
       });
-    }
+    },
   },
 })
 

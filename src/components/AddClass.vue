@@ -65,7 +65,7 @@
       }
     },
     mounted() {
-
+      console.log("add class: isediting: ", this.isEditing)
     },
     watch: {
 
@@ -76,14 +76,23 @@
     methods: {
       // ...mapActions(['saveModulePic']),
       emitNewClassDetails() {
-        const classObj = {
-          year_name: this.teachersClassName,
-          class_name: this.studentsClassName,
-          teacher: this.teacher.family_name,
-          color: this.color
+        if (this.isEditing) {
+          // save exisiting class
+          this.selectedClass.year_name = this.teachersClassName,
+            this.selectedClass.class_name = this.studentsClassName,
+            this.selectedClass.teacher = this.teacher.family_name,
+            this.selectedClass.color = this.color
+            this.$emit('saveClass', this.selectedClass)
+        } else {
+          const classObj = {
+            // save new class
+            year_name: this.teachersClassName,
+            class_name: this.studentsClassName,
+            teacher: this.teacher.family_name,
+            color: this.color
+          }
+          this.$emit('saveNewClass', classObj)
         }
-        console.log("class saved:", classObj)
-        this.$emit('saveClass', classObj)
       },
       deleteClassModal() {
         this.$buefy.dialog.confirm({

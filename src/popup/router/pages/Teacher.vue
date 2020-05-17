@@ -11,7 +11,7 @@
 			<!-- CLASSES NAV -->
 			<b-tabs v-model="activeTab" @input="tabClicked($event)">
 				<template v-for="(classGroup, index) in classes">
-					<b-tab-item :key="index" :label="classGroup.year_name" ref="tab">
+					<b-tab-item :key="index" :value="classGroup.year_name" :label="classGroup.year_name" ref="tab">
 
 						<!-- MODULE COMPONENTS -->
 						<transition name="dip" mode="out-in">
@@ -59,8 +59,8 @@
 						<Class v-if="showClassesFlag" :classes="classes" @editClass="editClass($event)"
 							@viewClass="viewClass($event)" />
 
-						<EditClass v-else-if="editClassFlag" :isEditing="isEditingClass" :selectedClass="selectedClass"
-							:teacher="staff" @close="closeClassEdit()" @saveClass="saveClass($event)"
+						<AddClass v-else-if="addClassFlag" :isEditing="isEditingClass" :selectedClass="selectedClass"
+							:teacher="staff" @close="closeClassEdit()" @saveClass="saveClass($event)" @saveNewClass="saveNewClass($event)"
 							@delete="removeSelectedClass($event)" />
 
 						<ViewClass v-if="viewClassFlag" :classGroup="selectedClass" @close="closeClassView()"
@@ -90,7 +90,7 @@
 	} from 'vuex'
 
 	import Class from "../../../components/Class.vue";
-	import EditClass from "../../../components/EditClass.vue";
+	import AddClass from "../../../components/AddClass.vue";
 	import ViewClass from "../../../components/ViewClass.vue";
 	// import AddStudentsToClass from "../../../components/AddStudentsToClass.vue";
 
@@ -107,7 +107,7 @@
 		name: "Teacher",
 		components: {
 			Class,
-			EditClass,
+			AddClass,
 			ViewClass,
 			// AddStudentsToClass,
 			Module,
@@ -131,7 +131,7 @@
 				editMilestoneFlag: false,
 				// CLASSES
 				showClassesFlag: false,
-				editClassFlag: false,
+				addClassFlag: false,
 				addStudentsFlag: false,
 				viewClassFlag: false,
 				// BUTTONS
@@ -180,15 +180,16 @@
 				}
 			},
 			classes: function (classes) {
-				console.log("classes changed")
-				// if (this.classes.length == 0) {
-				// 	//if no classes then show add class ui
-				// 	this.showClasses()
-				// }
+				console.log("classes changed. tab count: " , (Number(classes.length) + 1))
+				
 			}
 		},
 		computed: {
 			...mapState(['user', 'staff', 'profilePicUrl', 'modules', 'classes']),
+			// this sort doesnt update when the classes change (eg. deleting a class)
+			// sortedClasses() {
+			// 	return this.classes.sort((a, b) => (a.year_name > b.year_name) ? 1 : -1)	
+			// }
 		},
 		methods: {
 			...mapActions(['saveModuletoFirestore', 'saveMilestonetoFirestore', 'saveClasstoFirestore',
@@ -201,6 +202,7 @@
 					this.showModulesFlag = true;
 					this.addModuleButton = true;
 				}
+				console.log("tab clicked:",this.activeTab)
 			},
 			hideAllViewsAndButtons() {
 				this.showModulesFlag = false
@@ -213,7 +215,7 @@
 				this.showClassesFlag = false
 				this.viewClassFlag = false
 				this.classButtonFlag = false
-				this.editClassFlag = false
+				this.addClassFlag = false
 			},
 			//======= MODULES =======
 			showModules() {
@@ -319,6 +321,8 @@
 			//======= CLASSES =======
 			showClasses() {
 				this.hideAllViewsAndButtons()
+				this.isEditingClass = false
+				this.selectedClass = null;
 				this.showClassesFlag = true
 				this.classButtonFlag = true
 			},
@@ -326,13 +330,30 @@
 				// show view
 				this.showClassesFlag = false
 				this.classButtonFlag = false
-				this.editClassFlag = true
+				this.addClassFlag = true
 			},
 			saveClass(classObj) {
 				// this.showClasses()
-				this.showModules()
-				console.log("saving Class to FS:", classObj)
 				this.saveClasstoFirestore(classObj)
+				this.showClasses()
+				this.isEditingClass = false
+				this.selectedClass = null;
+			},
+			saveNewClass(classObj) {
+				// this.showClasses()
+				this.saveClasstoFirestore(classObj)
+				this.activeTab++
+				this.showModules()
+				this.isEditingClass = false
+				this.selectedClass = null;
+			},
+			saveClassStudents(classObj) {
+				this.hideAllViewsAndButtons()
+				console.log("saving class", classObj.id)
+				this.saveClasstoFirestore(classObj)
+				this.showClasses()
+				this.isEditingClass = false
+				this.selectedClass = null;
 			},
 			editClass(classGroup) {
 				this.hideAllViewsAndButtons()
@@ -341,7 +362,7 @@
 				this.isEditingClass = true
 				this.selectedClass = classGroup;
 				// show view
-				this.editClassFlag = true;
+				this.addClassFlag = true;
 			},
 			removeSelectedClass(classObj) {
 				this.showClasses()
@@ -356,11 +377,6 @@
 				this.hideAllViewsAndButtons()
 				this.selectedClass = classObj
 				this.viewClassFlag = true
-			},
-			saveClassStudents(classObj) {
-				this.hideAllViewsAndButtons()
-				this.saveClasstoFirestore(classObj)
-				this.showClasses()
 			},
 			closeClassView() {
 				this.viewClassFlag = false
