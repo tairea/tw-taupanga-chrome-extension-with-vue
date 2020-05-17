@@ -17,54 +17,27 @@
 						<transition name="dip" mode="out-in">
 
 							<!-- ======= MODULES ======= -->
-							<Module 
-								v-if="showModulesFlag" 
-								:modules="getModulesForThisClass(classGroup.year_name)"
-								@viewMilestones="viewMilestones($event)" 
-								@editModule="editModule($event)" 
-							/>
-							<AddModule 
-								v-else-if="addModuleFlag" 
-								:className="classGroup.class_name"
-								:yearName="classGroup.year_name" 
+							<Module v-if="showModulesFlag" :modules="getModulesForThisClass(classGroup.year_name)"
+								@viewMilestones="viewMilestones($event)" @editModule="editModule($event)" />
+							<AddModule v-else-if="addModuleFlag" :className="classGroup.class_name"
+								:yearName="classGroup.year_name" @close="showModules()"
+								@saveModule="saveModule($event,classGroup.year_name,classGroup.class_name)" />
+							<EditModule v-else-if="editModuleFlag" :module="selectedModule"
+								:className="classGroup.class_name" :yearName="classGroup.year_name"
 								@close="showModules()"
-								@saveModule="saveModule($event,classGroup.year_name,classGroup.class_name)" 
-							/>
-							<EditModule 
-								v-else-if="editModuleFlag" 
-								:module="selectedModule"
-								:className="classGroup.class_name" 
-								:yearName="classGroup.year_name"
-								@close="showModules()"
-								@saveModule="saveModule($event,classGroup.year_name,classGroup.class_name)" 
-							/>
+								@saveModule="saveModule($event,classGroup.year_name,classGroup.class_name)" />
 
 							<!-- ======= MILESTONES ======= -->
-							<ViewMilestones 
-								v-else-if="viewMilestonesFlag" 
-								:module="selectedModule"
-								@back="showModules()" 
-								@addMilestone="addMilestone($event)" 
-								@editMilestone="editMilestone($event)"
-							/>
-							<AddMilestone 
-								v-else-if="addMilestoneFlag" 
-								:module="selectedModule" 
-								@back="showModules()"
-								@backToModule="viewMilestones($event)" 
-								@saveMilestone="saveMilestone($event)" 
-							/>
-							<EditMilestone 
-								v-else-if="editMilestoneFlag" 
-								:module="selectedModule" 
-								:selectedMilestone="selectedMilestone" 
-								:selectedMilestoneIndex="selectedMilestoneIndex"
-								:isEditing="isEditingMilestone" 
-								@back="showModules()"
-								@backToModule="viewMilestones($event)" 
-								@updateMilestone="updateMilestone($event)" 
-								@delete="removeSelectedMilestone($event)" 
-							/>
+							<ViewMilestones v-else-if="viewMilestonesFlag" :module="selectedModule"
+								@back="showModules()" @addMilestone="addMilestone($event)"
+								@editMilestone="editMilestone($event)" />
+							<AddMilestone v-else-if="addMilestoneFlag" :module="selectedModule" @back="showModules()"
+								@backToModule="viewMilestones($event)" @saveMilestone="saveMilestone($event)" />
+							<EditMilestone v-else-if="editMilestoneFlag" :module="selectedModule"
+								:selectedMilestone="selectedMilestone" :selectedMilestoneIndex="selectedMilestoneIndex"
+								:isEditing="isEditingMilestone" @back="showModules()"
+								@backToModule="viewMilestones($event)" @updateMilestone="updateMilestone($event)"
+								@delete="removeSelectedMilestone($event)" />
 
 						</transition>
 
@@ -83,29 +56,15 @@
 					<transition name="dip" mode="out-in">
 
 						<!-- ======= CLASSES ======= -->
-						<Class 
-							v-if="showClassesFlag" 
-							:classes="classes" 
-							@editClass="editClass($event)"
-							@viewClass="viewClass($event)"
-						/>
+						<Class v-if="showClassesFlag" :classes="classes" @editClass="editClass($event)"
+							@viewClass="viewClass($event)" />
 
-						<EditClass 
-							v-else-if="saveClassFlag" 
-							:isEditing="isEditingClass" 
-							:selectedClass="selectedClass"
-							:teacher="staff" 
-							@close="closeClassEdit()" 
-							@saveClass="saveClass($event)"
-							@delete="removeSelectedClass($event)" 
-						/>
+						<EditClass v-else-if="editClassFlag" :isEditing="isEditingClass" :selectedClass="selectedClass"
+							:teacher="staff" @close="closeClassEdit()" @saveClass="saveClass($event)"
+							@delete="removeSelectedClass($event)" />
 
-						<ViewClass 
-							v-if="viewClassFlag" 
-							:classGroup="selectedClass"
-							@close="closeClassView()"
-							@saveClass="saveClass($event)"
-						/>
+						<ViewClass v-if="viewClassFlag" :classGroup="selectedClass" @close="closeClassView()"
+							@saveClassStudents="saveClassStudents($event)" />
 
 						<!-- <AddStudentsToClass v-else-if="addStudentsFlag" /> -->
 
@@ -172,7 +131,7 @@
 				editMilestoneFlag: false,
 				// CLASSES
 				showClassesFlag: false,
-				saveClassFlag: false,
+				editClassFlag: false,
 				addStudentsFlag: false,
 				viewClassFlag: false,
 				// BUTTONS
@@ -186,10 +145,13 @@
 				// IS EDITING FLAGS
 				isEditingClass: false,
 				isEditingMilestone: false,
-				
+
 			}
 		},
 		mounted() {
+			// reset views
+			this.hideAllViewsAndButtons()
+			this.showModules()
 			// TODO: bind only once at the beginning. not everytime mounted. (maybe local storage)
 			store.dispatch('bindStaff', this.user.email).then(() => {
 				store.commit('mapStaffData')
@@ -202,7 +164,7 @@
 				store.dispatch('bindClassesByStaff', this.staff.family_name)
 					.then(() => {
 						// store.commit('mapModulesByStaff')
-						if (classes.length == 0) {
+						if (this.classes.length == 0) {
 							//if no classes then show add class ui
 							this.showClasses()
 						}
@@ -219,7 +181,10 @@
 			},
 			classes: function (classes) {
 				console.log("classes changed")
-				this.activeTab = classes.length + 1
+				// if (this.classes.length == 0) {
+				// 	//if no classes then show add class ui
+				// 	this.showClasses()
+				// }
 			}
 		},
 		computed: {
@@ -246,8 +211,9 @@
 				// this.addMilestoneFlag = false
 				// this.addModuleButton = false
 				this.showClassesFlag = false
+				this.viewClassFlag = false
 				this.classButtonFlag = false
-				this.saveClassFlag = false
+				this.editClassFlag = false
 			},
 			//======= MODULES =======
 			showModules() {
@@ -333,9 +299,9 @@
 				const moduleObj = args.module
 				const milestoneIndex = args.index
 				console.log("updating...")
-				console.log("module",moduleObj)
-				console.log("milestoneIndex",milestoneIndex)
-				console.log("milestoneObj",milestoneObj)
+				console.log("module", moduleObj)
+				console.log("milestoneIndex", milestoneIndex)
+				console.log("milestoneObj", milestoneObj)
 				// update/replace via assignment
 				moduleObj.moduleMilestones[milestoneIndex] = milestoneObj
 				await this.saveMilestonetoFirestore(moduleObj)
@@ -360,10 +326,11 @@
 				// show view
 				this.showClassesFlag = false
 				this.classButtonFlag = false
-				this.saveClassFlag = true
+				this.editClassFlag = true
 			},
 			saveClass(classObj) {
-				this.showClasses()
+				// this.showClasses()
+				this.showModules()
 				console.log("saving Class to FS:", classObj)
 				this.saveClasstoFirestore(classObj)
 			},
@@ -374,7 +341,7 @@
 				this.isEditingClass = true
 				this.selectedClass = classGroup;
 				// show view
-				this.saveClassFlag = true;
+				this.editClassFlag = true;
 			},
 			removeSelectedClass(classObj) {
 				this.showClasses()
@@ -390,13 +357,10 @@
 				this.selectedClass = classObj
 				this.viewClassFlag = true
 			},
-			saveClass (args) {
-				// TODO: bind the students nsn's into this class
-				/*
-				const classObj = args.classGroup
-				const nsnArray = args.nsnArray
-				classObj.students = nsnArray
-				*/
+			saveClassStudents(classObj) {
+				this.hideAllViewsAndButtons()
+				this.saveClasstoFirestore(classObj)
+				this.showClasses()
 			},
 			closeClassView() {
 				this.viewClassFlag = false

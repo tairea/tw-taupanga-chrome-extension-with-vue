@@ -1,5 +1,6 @@
 <template>
   <div>
+    <p v-if="modules.length == 0" class="text">This class doesn't have any modules yet.<br>Click the add button to create a module.</p>
     <div v-for="(module, index) in modules" :key="index" class="card" style="margin: 20px;">
       <div class="card-content flex">
         <div class="module-title-col">
@@ -94,6 +95,13 @@
   .flex {
     display: flex;
   }
+
+  .text {
+		font-size: 0.8rem;
+		color: rgba(0, 0, 0, 0.6);
+		padding-top: 20px;
+		text-align: center;
+	}
 
   .module-title-col {
     width: 70%;

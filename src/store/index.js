@@ -56,33 +56,15 @@ export default new Vuex.Store({
     storeProfilePic(state, picUrl) {
       state.profilePicUrl = picUrl
     },
-    storeProfilePicForMany(state, allProfilePics) {
-
-      var result = state.allStudents;
-      var profilePics = allProfilePics.slice(0);
-
-      console.log("result length:", result.length)
-      console.log("allProfilePics length:", profilePics.length)
-      console.log(profilePics)
-
-      for (var i = 0 ; i < result.length ; i++){
-        if (!result[i].given_name) {continue}
-        var studentName = result[i].given_name.toLowerCase()
-        console.log("matching " + studentName + "...")
-        for (var j = 0; j < profilePics.length ; j++){
-          var picName = profilePics[j].name.split(".")[0]
-          var picUrl = profilePics[j].url
-          if ( studentName == picName ){
-            console.log(profilePics[j])
-            console.log(studentName + " and " + picName + " are a MATCH.")
-            console.log("Assigning url: ", picUrl)
-            result[i].profilePic = picUrl;
-          }
-        }; 
-
-      };
-      console.log(result);
-      state.allStudents = result
+    storeStudentProfilePic(state, args) {
+      var name = args.name
+      var url = args.url
+      for (var i = 0; i < state.allStudents.length; i++) {
+        if (state.allStudents[i].given_name == name) {
+          state.allStudents[i].profilePicUrl = url
+          console.log("matched " + name)
+        }
+      }
     },
     storeModulePicProgress(state, percentage) {
       state.modulePicProgress = percentage
@@ -96,6 +78,15 @@ export default new Vuex.Store({
       console.log("mapping staff")
       state.staff = state.staffs[0]
       console.log(state.staff)
+    },
+    mapProfilePicsToAllStudents(state, result) {
+      console.log("1 result:", result)
+      for (var i = 0; i < state.allStudents.length; i++) {
+        if (state.allStudents[i].nsn == result.nsn) {
+          state.allStudents[i] = result
+        }
+        console.log("from commit", state.allStudents[i])
+      } 
     },
     modulePicUrl(state, url) {
       console.log("mapping staff")
@@ -136,45 +127,26 @@ export default new Vuex.Store({
     // }),
     getProfilePic({ commit }, name) {
       firebaseStorage.ref('taiohi/' + name + '.png').getDownloadURL().then(function (url) {
-        console.log("got pic: " + url)
         commit('storeProfilePic', url)
       }).catch((err) => {
         console.log("error: " + err.message)
       })
     },
-    getProfilePicForMany({ commit }) {
-      const allProfilePics = []  
-      var storageRef = firebaseStorage.ref();
-
-      // Find all the prefixes and items.
-      storageRef
-        .child("taiohi")
-        .listAll()
-        .then(function(res) {    
-          res.items.forEach( (itemRef) => {
-            const picObj = {}
-            picObj.name = itemRef.name;
-            itemRef.getDownloadURL().then(function(url) {
-              picObj.url = url
-            });
-            // console.log("got url for " + picObj.picName, picObj.picUrl)
-            allProfilePics.push(picObj)
-          });
-          console.log(allProfilePics)
-          commit('storeProfilePicForMany', allProfilePics)
+    getStudentProfilePic({ commit }, args) {
+      var name = args.name
+      name = name.replace(/ /g, '');
+      var nsn = String(args.nsn)
+      console.log("got ",args)
+      var lowerName = name.toLowerCase()
+      firebaseStorage.ref('taiohi/' + lowerName + '.png').getDownloadURL().then(function (url) {
+        //commit('storeStudentProfilePic', {url:url, name:name})
+        var picObj = {profilePicUrl: url}
+        firebaseDb.collection('students/').doc(nsn).update(picObj).then(() => {
+          console.log(name + "'s pic stored in fs")
         })
-        .catch(function(error) {
-          // Uh-oh, an error occurred!
-          console.log(error)
-        });
-        
-
-        // firebaseStorage.ref('taiohi/' + args.name + '.png').getDownloadURL().then(function (url) {
-        //   console.log("retireved pic for: " + args.name)
-        //   commit('storeProfilePicForMany', { url:url, nsn: args.nan })
-        // }).catch((err) => {
-        //   console.log("error: " + err.message)
-        // })
+      }).catch((err) => {
+        console.log("error: " + err.message)
+      })
     },
     saveModulePic({ commit }, newModule) {
       // ceate a storage ref
@@ -213,23 +185,24 @@ export default new Vuex.Store({
     },
     saveClasstoFirestore({},classObj) {
       console.log("saving CLASS to firestore:", classObj)
-      firebaseDb.collection("taupanga-classes/").doc(classObj.class_name+" - "+classObj.year_name).set(classObj)
-      .then(function() {
-        console.log("Document successfully written!");
-      })
-      .catch(function(error) {
-        console.error("Error writing document: ", error);
-      });
+      if (!classObj.id) {
+        const ref = firebaseDb.collection("taupanga-classes/").doc()
+        classObj.id = ref.id
+        console.log("getting new id for class = ", classObj.id)
+        firebaseDb.collection("taupanga-classes/").doc(classObj.teacher+"-"+classObj.id).set(classObj)
+        .then(function() { console.log("Document successfully written!");})
+        .catch(function(error) { console.error("Error writing document: ", error);})
+      } else {
+        firebaseDb.collection("taupanga-classes/").doc(classObj.id).set(classObj)
+        .then(function() { console.log("Document successfully written!");})
+        .catch(function(error) { console.error("Error writing document: ", error);})
+      }
     },
     removeClassFromFirestore({},classObj) {
-      console.log("deleting CLASS to firestore:", classObj)
-      firebaseDb.collection("taupanga-classes/").doc(classObj.class_name+" - "+classObj.year_name).delete()
-      .then(function() {
-        console.log("Document successfully deleted!");
-      })
-      .catch(function(error) {
-        console.error("Error deleting document: ", error);
-      });
+      console.log("deleting CLASS from firestore: " + classObj.id)
+      firebaseDb.collection("taupanga-classes/").doc(classObj.teacher + "-" + classObj.id).delete()
+      .then(function() { console.log("Document successfully deleted!"); })
+      .catch(function(error) { console.error("Error deleting document: ", error);});
     },
     saveMilestonetoFirestore({},moduleObj) {
       console.log("in store: saving to firestore: ", moduleObj)

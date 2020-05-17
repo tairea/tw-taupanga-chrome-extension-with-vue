@@ -82,6 +82,7 @@
           teacher: this.teacher.family_name,
           color: this.color
         }
+        console.log("class saved:", classObj)
         this.$emit('saveClass', classObj)
       },
       deleteClassModal() {
@@ -91,7 +92,7 @@
           confirmText: 'Delete Class',
           type: 'is-danger',
           hasIcon: true,
-          onConfirm: () =>  {
+          onConfirm: () => {
             this.$emit('delete', this.selectedClass)
             this.$buefy.toast.open('Account deleted!')
           }
@@ -104,6 +105,12 @@
 <style>
   .labelSize>.label {
     font-size: 0.9rem !important;
+  }
+
+  @media screen and (max-width: 768px) {
+    .modal .animation-content {
+      width: 80% !important;
+    }
   }
 </style>
 

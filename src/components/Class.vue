@@ -25,7 +25,7 @@
 						<div class="class-number" :style="{backgroundColor: classGroup.color}">
 							<!-- <div class="class-number"> -->
 							<!-- Number of taiohi in this class -->
-							<p class="has-text-white title is-4">32</p>
+							<p class="has-text-white title is-4">{{classGroup.studentsInClass ? classGroup.studentsInClass.length : 0 }}</p>
 						</div>
 					</div>
 				</div>

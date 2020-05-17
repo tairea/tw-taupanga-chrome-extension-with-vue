@@ -17,7 +17,7 @@
 
       <div class="class-number-col">
           <div class="class-number">
-            <p class="has-text-white title is-4">{{ numberOfStudents }}</p>
+            <p class="has-text-white title is-4">{{ number }}</p>
           </div>
         </div>
     </div>
@@ -28,7 +28,7 @@
 
   export default {
     name: "ClassBanner",
-    props: ['classGroup'],
+    props: ['classGroup', 'number'],
     components: {
 
     },
@@ -76,7 +76,7 @@
   .class-number {
 		width: 60px;
 		height: 60px;
-		border: 1px solid rgba(0, 0, 0, 0.6);
+		border: 1px solid rgba(255, 255, 255, 1);
 		border-radius: 50%;
 		display: flex;
 		justify-content: center;
