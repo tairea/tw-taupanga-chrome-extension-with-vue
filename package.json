@@ -17,7 +17,7 @@
   },
   "dependencies": {
     "@creativebulma/bulma-divider": "^1.1.0",
-    "axios": "^0.19.0",
+    "axios": "^0.21.1",
     "buefy": "^0.8.15",
     "firebase": "^7.14.0",
     "vue": "^2.6.10",
